@@ -1,19 +1,4 @@
-﻿// Copyright 2010-2022 Google LLC
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-// [START program]
-// [START import]
-using System;
+﻿using System;
 using System.Collections;
 using System.Threading.Tasks;
 using Google.OrTools.ConstraintSolver;
@@ -21,67 +6,6 @@ using Google.OrTools.Sat;
 using IntervalVar = Google.OrTools.Sat.IntervalVar;
 using IntVar = Google.OrTools.Sat.IntVar;
 
-// [END import]
-
-public enum TrainType{ PASSENGER, CARGO, NONE };
-public class Train
-{
-    public int timeArival, timeDeparture, timeStop, len, speed;
-    public int vertexIn;
-    public int vertexOut;
-    public TrainType type;
-    public Train(int timeArrival, int timeDeparture, int timeStop, int len, int speed, int vertexIn, int vertexOut, TrainType type)
-    {
-        this.timeArival= timeArrival;
-        this.timeStop= timeStop;
-        this.timeDeparture= timeDeparture;
-        this.type = type;
-        this.len = len;
-        this.speed = speed;
-        this.vertexIn = vertexIn;
-        this.vertexOut = vertexOut;
-    }
-}
-
-public class ShedulerGraphVertex
-{
-    public int edgeId;
-    public int vertexBegin;
-    public int vertexEnd;
-    public int edgeLen;
-    public List<ShedulerGraphVertex> adjacentVert;
-    ShedulerGraphVertex(int edgeId,  int vertexBegin, int vertexEnd, int edgeLen)
-    {
-        this.edgeLen = edgeLen;
-        this.vertexBegin = vertexBegin;
-        this.vertexEnd = vertexEnd;
-        this.edgeId = edgeId;
-    }
-}
-
-public class Path
-{
-    public int start;
-    public int end;
-    public int length;
-    public Path(int start, int end, int length)
-    {
-        this.start = start;
-        this.end = end;
-        this.length = length;
-    }
-}
-
-public class Vertex
-{
-    public TrainType platformType;
-    public int len;
-    public Vertex(TrainType platformType, int len)
-    {
-        this.platformType = platformType;
-        this.len = len;
-    }
-}
 
 public class sampleInput
 {
@@ -166,6 +90,23 @@ public class SimpleSatProgram
         return null;
     }
 
+    static int findIdOfPathFromAtoB(Path[] paths, int a, int b)
+    {
+        for (int ans = 0; ans < paths.Length; ++ans)
+        {
+            if (paths[ans].start == a && paths[ans].end == b)
+            {
+                return ans;
+            }
+        }
+        return -1;
+    }
+
+    static bool hasTimeIntervalsIntersection(int t0_begin, int t0_end, int t1_begin, int t1_end)
+    {
+        return Math.Min(t0_end, t1_end) >= Math.Max(t0_begin, t1_begin);
+    } 
+
     static void Main()
     {
         CpModel model = new CpModel();
@@ -179,7 +120,8 @@ public class SimpleSatProgram
         bool[,] hasPathsIntersection = data.hasPathsIntersection;
         int[] platformsId = data.platformsId;
 
-    BoolVar[,] trainGoesThroughPlatf = new BoolVar[numTrains, numPlatforms];
+
+        BoolVar[,] trainGoesThroughPlatf = new BoolVar[numTrains, numPlatforms];
         for (int trainId = 0; trainId < numTrains; trainId++)
         {
             for (int platNum = 0; platNum < numPlatforms; platNum++) 
@@ -203,11 +145,21 @@ public class SimpleSatProgram
             Train train = trains[trainId];
             for (int platNum = 0; platNum < numPlatforms; platNum++)
             {
+                Path path0FromIn = findPathFromAtoB(paths, train.vertexIn, platformsId[platNum]);
+                Path path0ToOut = findPathFromAtoB(paths, platformsId[platNum], train.vertexOut);
+                if (path0FromIn == null || path0ToOut == null)
+                {
+                    continue;
+                } 
+
+                int t0 = train.timeArival, t1 = t0 + (path0FromIn.length + train.speed - 1) / train.speed;
+                int t3 = train.timeDeparture, t2 = t3 - (path0ToOut.length + train.speed - 1) / train.speed;
                 Vertex platformVertex = vertices[platformsId[platNum]];
                 if (platformVertex.platformType == train.type &&
                     platformVertex.len >= train.len &&
                     checkPathFromAtoBexistence(paths, train.vertexIn, platformsId[platNum]) &&
-                    checkPathFromAtoBexistence(paths, platformsId[platNum], train.vertexOut))
+                    checkPathFromAtoBexistence(paths, platformsId[platNum], train.vertexOut) &&
+                    t1 + train.timeStop <= t2 )
                 {
                     goodPlatforms.Add(trainGoesThroughPlatf[trainId, platNum]);
                 }
@@ -218,21 +170,48 @@ public class SimpleSatProgram
         }
 
         // model.Add(trainGoesThroughPlatf[0, 0] && trainGoesThroughPlatf[1, 1] == trainGoesThroughPlatf[0, 0]);
-         model.Add(trainGoesThroughPlatf[2, 0] == 1).OnlyEnforceIf(trainGoesThroughPlatf[0, 1].Not());
-        ILiteral[] kek = { trainGoesThroughPlatf[0, 0] };
-        model.AddAtLeastOne( kek);
+       //  model.Add(trainGoesThroughPlatf[2, 0] == 1).OnlyEnforceIf(trainGoesThroughPlatf[0, 1].Not());
+       // ILiteral[] kek = { trainGoesThroughPlatf[0, 0] };
+      //  model.AddAtLeastOne( kek);
         for (int train0id = 0; train0id < numTrains; train0id++)
         {
             Train train0 = trains[train0id];
             for (int plat0id = 0; plat0id < numPlatforms; plat0id++)
             {
-                Path path0FromIn = findPathFromAtoB(paths, train0.vertexIn, plat0id);
-                Path path0ToOut = findPathFromAtoB(paths, plat0id, train0.vertexOut);
-                for (int train1id = 0; train1id < numPlatforms;  train1id++)
+                Path path0FromIn = findPathFromAtoB(paths, train0.vertexIn, platformsId[plat0id]);
+                int p0inId = findIdOfPathFromAtoB(paths, train0.vertexIn, platformsId[plat0id]);
+                Path path0ToOut = findPathFromAtoB(paths, platformsId[plat0id], train0.vertexOut);
+                int p0outId = findIdOfPathFromAtoB(paths, platformsId[plat0id], train0.vertexOut);
+                if (path0FromIn == null || path0ToOut == null)
                 {
+                    continue;
+                }
+                int t0_0 = train0.timeArival, t0_1 = t0_0 + (path0FromIn.length + train0.speed - 1) / train0.speed;
+                int t0_3 = train0.timeDeparture, t0_2 = t0_3 - (path0ToOut.length + train0.speed - 1) / train0.speed;
+
+                for (int train1id = train0id + 1; train1id < numPlatforms;  train1id++)
+                {
+                    Train train1 = trains[train1id];
                     for (int plat1id = 0; plat1id < numPlatforms; plat1id++)
                     {
+                        Path path1FromIn = findPathFromAtoB(paths, train1.vertexIn, platformsId[plat1id]);
+                        int p1inId = findIdOfPathFromAtoB(paths, train1.vertexIn, platformsId[plat1id]);
+                        Path path1ToOut = findPathFromAtoB(paths, platformsId[plat1id], train1.vertexOut);
+                        int p1outId = findIdOfPathFromAtoB(paths, platformsId[plat1id], train1.vertexOut);
+                        if (path1FromIn == null || path1ToOut == null)
+                        {
+                            continue;
+                        }
+                        int t1_0 = train1.timeArival, t1_1 = t1_0 + (path1FromIn.length + train1.speed - 1) / train1.speed;
+                        int t1_3 = train1.timeDeparture, t1_2 = t1_3 - (path1ToOut.length + train1.speed - 1) / train1.speed;
 
+                        if ((plat0id == plat1id && hasTimeIntervalsIntersection(t0_1, t0_2, t1_1, t1_2)) ||
+                            (hasPathsIntersection[p0inId, p1inId] && hasTimeIntervalsIntersection(t0_0, t0_1, t1_0, t1_1)) ||
+                            (hasPathsIntersection[p0outId, p1outId] && hasTimeIntervalsIntersection(t0_2, t0_3, t1_2, t1_3))
+                            ) {
+                            ILiteral[] boolVars = { trainGoesThroughPlatf[train0id, plat0id].Not(), trainGoesThroughPlatf[train1id, plat1id].Not() };
+                            model.AddBoolOr(boolVars);
+                        }
                     }
                 }
             }
@@ -250,6 +229,17 @@ public class SimpleSatProgram
                     Console.Write(solver.Value(trainGoesThroughPlatf[trainId, platNum]));
                 }
                 Console.WriteLine();
+            }
+
+            for (int trainId = 0; trainId < numTrains; trainId++)
+            {
+                for (int platNum = 0; platNum < numPlatforms; platNum++)
+                {
+                    if (solver.Value(trainGoesThroughPlatf[trainId, platNum]) == 1)
+                    {
+                        Console.WriteLine($"Train {trainId} goes through platform {platNum}");
+                    }
+                }
             }
         }
         else
@@ -308,4 +298,3 @@ public class SimpleSatProgram
                 */
     }
 }
-// [END program]
