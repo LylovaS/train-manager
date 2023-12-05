@@ -1,4 +1,4 @@
-using SolverLibrary;
+using SolverLibrary.Model;
 
 namespace SolverLibraryTests
 {
@@ -8,18 +8,18 @@ namespace SolverLibraryTests
         [TestMethod]
         public void TrafficVertex()
         {
-            TrafficLightVertex v = new TrafficLightVertex();
+            TrafficLightVertex v = new TrafficLightVertex(10);
             Vertex v2 = v;
-            Assert.AreEqual(v.getVertexType(), vertexType.TRAFFIC);
-            Assert.AreEqual(v2.getVertexType(), vertexType.TRAFFIC);
-            Assert.IsFalse(v2.isBlocked());
-            Assert.IsFalse(v.isBlocked());
-            v2.block();
-            Assert.IsTrue(v2.isBlocked());
-            Assert.IsTrue(v.isBlocked());
-            v2.unblock();
-            Assert.IsFalse(v2.isBlocked());
-            Assert.IsFalse(v.isBlocked());
+            Assert.AreEqual(v.GetVertexType(), vertexType.TRAFFIC);
+            Assert.AreEqual(v2.GetVertexType(), vertexType.TRAFFIC);
+            Assert.IsFalse(v2.IsBlocked());
+            Assert.IsFalse(v.IsBlocked());
+            v2.Block();
+            Assert.IsTrue(v2.IsBlocked());
+            Assert.IsTrue(v.IsBlocked());
+            v2.Unblock();
+            Assert.IsFalse(v2.IsBlocked());
+            Assert.IsFalse(v.IsBlocked());
         }
     }
 }
