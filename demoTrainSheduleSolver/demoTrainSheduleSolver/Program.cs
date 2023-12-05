@@ -25,7 +25,7 @@ public class sampleInput
             new Vertex(TrainType.NONE, 100),
             new Vertex(TrainType.NONE, 50),
             new Vertex(TrainType.NONE, 200),
-            new Vertex(TrainType.CARGO, 700),
+            new Vertex(TrainType.PASSENGER, 700),
             new Vertex(TrainType.NONE, 300)
         };
         this.vertices = vertices;
@@ -34,8 +34,8 @@ public class sampleInput
         Train[] trains =
         {
             new Train(0, 70, 40, 400, 200, 1, 3, TrainType.CARGO),
-            new Train(10, 70, 40, 600, 200, 8, 5, TrainType.CARGO),
-            new Train(70, 200, 60, 500, 200, 8, 5, TrainType.CARGO)
+            new Train(10, 70, 40, 600, 200, 8, 5, TrainType.PASSENGER),
+            new Train(68, 200, 60, 500, 200, 8, 5, TrainType.CARGO)
         };
         Path[] paths =
         {
@@ -189,7 +189,7 @@ public class SimpleSatProgram
                 int t0_0 = train0.timeArival, t0_1 = t0_0 + (path0FromIn.length + train0.speed - 1) / train0.speed;
                 int t0_3 = train0.timeDeparture, t0_2 = t0_3 - (path0ToOut.length + train0.speed - 1) / train0.speed;
 
-                for (int train1id = train0id + 1; train1id < numPlatforms;  train1id++)
+                for (int train1id = train0id + 1; train1id < numTrains;  train1id++)
                 {
                     Train train1 = trains[train1id];
                     for (int plat1id = 0; plat1id < numPlatforms; plat1id++)
