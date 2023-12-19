@@ -6,16 +6,24 @@ namespace SolverLibrary.Model
         private int length;
         private Vertex start, end;
         private bool blocked;
+        private TrainType edgeType;
 
         public Edge(int length, Vertex start, Vertex end)
         {
-            this.length = length;
+            SetLength(length);
             this.start = start;
             this.end = end;
             blocked = false;
         }
         public int GetLength() { return length; }
-        public void SetLength(int length) { this.length = length; }
+        public void SetLength(int length)
+        {
+            if (length < 0)
+            {
+                throw new ArgumentException("Edge length must be positive.");
+            }
+            this.length = length;
+        }
         public Vertex GetStart() { return start; }
         public void SetStart(Vertex start) { this.start = start; }
         public Vertex GetEnd() { return end; }
@@ -23,5 +31,20 @@ namespace SolverLibrary.Model
         public bool IsBlocked() { return blocked; }
         public void Block() { blocked = true; }
         public void Unblock() { blocked = false; }
+        public void SetEdgeType(TrainType edgeType) { this.edgeType = edgeType; }
+        public TrainType GetEdgeType() { return edgeType; }
+
+        public Vertex? GetVertexOut(Vertex vertexIn)
+        {
+            if (vertexIn == start)
+            {
+                return end;
+            }
+            else if (vertexIn == end)
+            {
+                return start;
+            }
+            return null;
+        }
     }
 }
