@@ -1,4 +1,6 @@
-using SolverLibrary.Model;
+using SolverLibrary.Model.Graph;
+using SolverLibrary.Model.Graph.VertexTypes;
+using SolverLibrary.Model.TrainInfo;
 
 namespace SolverLibraryTests
 {
@@ -10,8 +12,8 @@ namespace SolverLibraryTests
         {
             TrafficLightVertex v = new TrafficLightVertex(10);
             Vertex v2 = v;
-            Assert.AreEqual(v.GetVertexType(), vertexType.TRAFFIC);
-            Assert.AreEqual(v2.GetVertexType(), vertexType.TRAFFIC);
+            Assert.AreEqual(v.GetVertexType(), VertexType.TRAFFIC);
+            Assert.AreEqual(v2.GetVertexType(), VertexType.TRAFFIC);
             Assert.IsFalse(v2.IsBlocked());
             Assert.IsFalse(v.IsBlocked());
             v2.Block();

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SolverLibrary.Model.Graph;
+using SolverLibrary.Model.Graph.VertexTypes;
+using SolverLibrary.Model.TrainInfo;
 
 namespace SolverLibrary.Model
 {

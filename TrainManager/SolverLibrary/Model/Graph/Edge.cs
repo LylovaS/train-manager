@@ -1,5 +1,7 @@
-﻿
-namespace SolverLibrary.Model
+﻿using SolverLibrary.Model.TrainInfo;
+using SolverLibrary.Model.Graph.VertexTypes;
+
+namespace SolverLibrary.Model.Graph
 {
     public class Edge
     {

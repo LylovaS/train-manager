@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SolverLibrary.Model.Graph.VertexTypes;
 
-namespace SolverLibrary.Model
+namespace SolverLibrary.Model.TrainInfo
 {
     public class SingleTrainSchedule
     {
@@ -55,7 +56,7 @@ namespace SolverLibrary.Model
         public OutputVertex GetVertexOut() { return vertexOut; }
         public void SetVertexOut(OutputVertex vertexOut) { this.vertexOut = vertexOut; }
 
-        private void CheckTimeStamps() 
+        private void CheckTimeStamps()
         {
             if (timeDeparture < timeArrival + timeStop)
             {

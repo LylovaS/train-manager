@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SolverLibrary.Model.Graph.VertexTypes;
+using SolverLibrary.Model.TrainInfo;
 
-namespace SolverLibrary.Model
+namespace SolverLibrary.Model.Graph
 {
     public class StationGraph
     {
@@ -33,6 +35,8 @@ namespace SolverLibrary.Model
                 if (t.Item1 != null) { edges.Add(t.Item1); }
                 if (t.Item2 != null) { edges.Add(t.Item2); }
             }
+            if (vertex.GetVertexType().Equals(VertexType.INPUT)) { inputVertices.Add((InputVertex)vertex); }
+            if (vertex.GetVertexType().Equals(VertexType.OUTPUT)) { outputVertices.Add((OutputVertex)vertex); }
             return true;
         }
 
@@ -139,14 +143,8 @@ namespace SolverLibrary.Model
             return result;
         }
 
-        public HashSet<InputVertex> GetInputVertices()
-        {
-            return inputVertices;
-        }
-
-        public HashSet<OutputVertex> GetOutputVertices()
-        {
-            return outputVertices;
-        }
+        public HashSet<Vertex> GetVertices() { return vertices; }
+        public HashSet<InputVertex> GetInputVertices() { return inputVertices; }
+        public HashSet<OutputVertex> GetOutputVertices() { return outputVertices; }
     }
 }

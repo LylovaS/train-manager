@@ -1,4 +1,6 @@
-﻿namespace SolverLibrary.Model
+﻿using SolverLibrary.Model.Graph;
+
+namespace SolverLibrary.Model.Graph.VertexTypes
 {
     public enum TrafficLightStatus { STOP, PASSING }
 
@@ -6,15 +8,15 @@
     {
         private TrafficLightStatus status;
 
-        public TrafficLightVertex(int id) : base(vertexType.TRAFFIC, id)
+        public TrafficLightVertex(int id) : base(VertexType.TRAFFIC, id)
         {
             status = TrafficLightStatus.STOP;
         }
 
         public void SetEdges(Edge edge1, Edge edge2)
         {
-            base.edgeConnections.Clear();
-            base.edgeConnections.Add(new Tuple<Edge, Edge>(edge1, edge2));
+            edgeConnections.Clear();
+            edgeConnections.Add(new Tuple<Edge, Edge>(edge1, edge2));
         }
 
         public TrafficLightStatus GetStatus()

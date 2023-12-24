@@ -1,0 +1,14 @@
+﻿[
+  {
+    "train": {
+      "length": 10,
+      "speed": 1,
+      "trainType": "TrainType_NONE"
+    },
+    "timeArrival": 0,
+    "timeDeparture": 5,
+    "timeStop": 4,
+    "vertexIn": 0,
+    "vertexOut": 1
+  }
+]

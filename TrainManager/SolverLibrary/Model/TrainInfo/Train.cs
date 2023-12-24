@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SolverLibrary.Model
+namespace SolverLibrary.Model.TrainInfo
 {
     public enum TrainType { PASSENGER, CARGO, NONE };
     public class Train
