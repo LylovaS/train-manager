@@ -8,11 +8,12 @@ namespace SolverLibrary.Model
         private bool blocked;
         private TrainType edgeType;
 
-        public Edge(int length, Vertex start, Vertex end)
+        public Edge(int length, Vertex start, Vertex end, TrainType edgeType)
         {
             SetLength(length);
             this.start = start;
             this.end = end;
+            this.edgeType = edgeType;
             blocked = false;
         }
         public int GetLength() { return length; }

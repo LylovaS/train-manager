@@ -30,8 +30,8 @@ namespace SolverLibrary.Model
             vertices.Add(vertex);
             foreach (Tuple<Edge, Edge> t in vertex.GetEdgeConnections())
             {
-                edges.Add(t.Item1);
-                edges.Add(t.Item2);
+                if (t.Item1 != null) { edges.Add(t.Item1); }
+                if (t.Item2 != null) { edges.Add(t.Item2); }
             }
             return true;
         }
@@ -69,15 +69,19 @@ namespace SolverLibrary.Model
             HashSet<Vertex> verticesSet = new HashSet<Vertex>();
             HashSet<Edge> edgesSet = new HashSet<Edge>();
             verticesSet.Clear();
-            Vertex start = verticesSet.First();
+            Vertex start = vertices.First();
             verticesSet.Add(start);
             edgesSet.Clear();
             Edge edge = start.GetEdgeConnections().First().Item1;
-            edgesSet.Add(start.GetEdgeConnections().First().Item1);
-            return FindAllVertices(start, edge, verticesSet, edgesSet);
+            if (edge == null)
+            {
+                edge = start.GetEdgeConnections().First().Item2;
+            }
+            //edgesSet.Add(edge);
+            return FindAllVertices(start, null, verticesSet, edgesSet);
         }
 
-        public bool FindAllVertices(Vertex vertex, Edge edge, HashSet<Vertex> acc, HashSet<Edge> path)
+        public bool FindAllVertices(Vertex vertex, Edge? edge, HashSet<Vertex> acc, HashSet<Edge> path)
         {
             if (acc.Count == vertices.Count)
             {
@@ -102,7 +106,10 @@ namespace SolverLibrary.Model
                     {
                         acc.Add(nextVertex);
                         path.Add(nextEdge);
-                        FindAllVertices(nextVertex, nextEdge, acc, path);
+                        if (FindAllVertices(nextVertex, nextEdge, acc, path))
+                        {
+                            return true;
+                        }
                     }
                 }
             }

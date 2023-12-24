@@ -55,7 +55,7 @@ namespace SolverLibrary.Model
         public OutputVertex GetVertexOut() { return vertexOut; }
         public void SetVertexOut(OutputVertex vertexOut) { this.vertexOut = vertexOut; }
 
-        public void CheckTimeStamps()
+        private void CheckTimeStamps() 
         {
             if (timeDeparture < timeArrival + timeStop)
             {
