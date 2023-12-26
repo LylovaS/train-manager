@@ -74,7 +74,7 @@ namespace SolverLibrary.Model.Graph
             HashSet<Edge> edgesSet = new HashSet<Edge>();
             verticesSet.Clear();
             Vertex start = vertices.First();
-            verticesSet.Add(start);
+           // verticesSet.Add(start);
             edgesSet.Clear();
             Edge edge = start.GetEdgeConnections().First().Item1;
             if (edge == null)
@@ -82,42 +82,35 @@ namespace SolverLibrary.Model.Graph
                 edge = start.GetEdgeConnections().First().Item2;
             }
             //edgesSet.Add(edge);
-            return FindAllVertices(start, null, verticesSet, edgesSet);
+            FindAllVertices(start, null, verticesSet, edgesSet);
+            return verticesSet.Count == vertices.Count;
         }
 
-        public bool FindAllVertices(Vertex vertex, Edge? edge, HashSet<Vertex> acc, HashSet<Edge> path)
+        public void FindAllVertices(Vertex vertex, Edge? edge, HashSet<Vertex> acc, HashSet<Edge> path)
         {
-            if (acc.Count == vertices.Count)
+            if (acc.Contains(vertex))
             {
-                return true;
+                return;
             }
+            acc.Add(vertex);
             Tuple<Edge, Edge>[] tuples = vertex.GetEdgeConnections().ToArray();
             foreach (Tuple<Edge, Edge> t in tuples)
             {
-                Edge? nextEdge = null;
-                if (t.Item1 != edge && t.Item2 == edge)
-                {
-                    nextEdge = t.Item1;
+                Vertex? next_vertex = null;
+                if (t.Item1 != null) {
+                    next_vertex = t.Item1.GetStart();
+                    FindAllVertices(next_vertex, edge, acc, path);
+                    next_vertex = t.Item1.GetEnd();
+                    FindAllVertices(next_vertex, edge, acc, path);
                 }
-                else if (t.Item1 == edge && t.Item2 != edge)
+                if (t.Item2 != null)
                 {
-                    nextEdge = t.Item2;
-                }
-                if (nextEdge != null && !path.Contains(nextEdge))
-                {
-                    Vertex? nextVertex = nextEdge.GetVertexOut(vertex);
-                    if (nextVertex != null && !acc.Contains(nextVertex))
-                    {
-                        acc.Add(nextVertex);
-                        path.Add(nextEdge);
-                        if (FindAllVertices(nextVertex, nextEdge, acc, path))
-                        {
-                            return true;
-                        }
-                    }
+                    next_vertex = t.Item2.GetStart();
+                    FindAllVertices(next_vertex, edge, acc, path);
+                    next_vertex = t.Item2.GetEnd();
+                    FindAllVertices(next_vertex, edge, acc, path);
                 }
             }
-            return false;
         }
 
         public List<Edge> FindEdgesWithType(TrainType type)

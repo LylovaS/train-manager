@@ -16,7 +16,7 @@ namespace SolverLibrary.Model.Graph.VertexTypes
         public void SetEdges(Edge edge1, Edge edge2)
         {
             edgeConnections.Clear();
-            edgeConnections.Add(new Tuple<Edge, Edge>(edge1, edge2));
+            edgeConnections.Add(new Tuple<Edge?, Edge?>(edge1, edge2));
         }
 
         public TrafficLightStatus GetStatus()

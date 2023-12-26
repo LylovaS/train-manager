@@ -12,7 +12,7 @@ namespace SolverLibrary.Model.Graph.VertexTypes
         public void SetEdges(Edge edge1, Edge edge2)
         {
             base.edgeConnections.Clear();
-            base.edgeConnections.Add(new Tuple<Edge, Edge>(edge1, edge2));
+            base.edgeConnections.Add(new Tuple<Edge?, Edge?>(edge1, edge2));
         }
     }
 }

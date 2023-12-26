@@ -8,7 +8,7 @@ namespace SolverLibrary.Model.Graph.VertexTypes
         private readonly VertexType type;
         private readonly int id;
         private bool blocked;
-        protected List<Tuple<Edge, Edge>> edgeConnections = new List<Tuple<Edge, Edge>>();
+        protected List<Tuple<Edge?, Edge?>> edgeConnections = new();
 
         protected Vertex(VertexType type, int id)
         {
@@ -19,7 +19,7 @@ namespace SolverLibrary.Model.Graph.VertexTypes
         {
             return type;
         }
-        public List<Tuple<Edge, Edge>> GetEdgeConnections() { return edgeConnections; }
+        public List<Tuple<Edge?, Edge?>> GetEdgeConnections() { return edgeConnections; }
         public bool IsBlocked() { return blocked; }
         public void Block() { blocked = true; }
         public void Unblock() { blocked = false; }

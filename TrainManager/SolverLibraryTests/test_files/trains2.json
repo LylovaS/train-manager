@@ -1,0 +1,12 @@
+﻿[
+  {
+    "length": 450,
+    "speed": ,
+    "trainType": "TrainType_CARGO"
+  },
+  {
+    "length": 600,
+    "speed": 3,
+    "trainType": "TrainType_PASSENGER"
+  }
+]

@@ -15,8 +15,8 @@ namespace SolverLibrary.Model.TrainInfo
 
         public SingleTrainSchedule(int timeArrival, int timeDeparture, int timeStop, InputVertex vertexIn, OutputVertex vertexOut)
         {
-            SetTimeArrival(timeArrival);
             SetTimeDeparture(timeDeparture);
+            SetTimeArrival(timeArrival);
             SetTimeStop(timeStop);
             this.vertexIn = vertexIn;
             this.vertexOut = vertexOut;

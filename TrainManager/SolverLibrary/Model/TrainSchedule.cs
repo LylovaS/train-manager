@@ -90,5 +90,10 @@ namespace SolverLibrary.Model
             }
             return true;
         }
+
+        public Dictionary<Train, SingleTrainSchedule> GetSchedule()
+        {
+            return schedule;
+        }
     }
 }

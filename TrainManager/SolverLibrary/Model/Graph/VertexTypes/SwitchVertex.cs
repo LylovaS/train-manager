@@ -12,8 +12,8 @@ namespace SolverLibrary.Model.Graph.VertexTypes
         public void SetEdges(Edge inputEdge, Edge switchEdge1, Edge switchEdge2)
         {
             edgeConnections.Clear();
-            edgeConnections.Add(new Tuple<Edge, Edge>(inputEdge, switchEdge1));
-            edgeConnections.Add(new Tuple<Edge, Edge>(inputEdge, switchEdge2));
+            edgeConnections.Add(new Tuple<Edge?, Edge?>(inputEdge, switchEdge1));
+            edgeConnections.Add(new Tuple<Edge?, Edge?>(inputEdge, switchEdge2));
         }
         public SwitchStatus GetStatus() { return status; }
         public void ChangeStatus()

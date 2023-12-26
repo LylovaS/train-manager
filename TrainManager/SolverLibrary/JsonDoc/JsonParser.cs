@@ -156,7 +156,7 @@ namespace SolverLibrary.JsonDoc
                                 {
                                     Edge? e1 = connections.ElementAt(0).Item1 >= 0 ? edges.ElementAt(connections.ElementAt(0).Item1) : null;
                                     Edge? e2 = connections.ElementAt(0).Item2 >= 0 ? edges.ElementAt(connections.ElementAt(0).Item2) : null;
-                                    ((OutputVertex)vertices.ElementAt(v.GetId())).SetEdge(e1 == null ? e2 : e1);
+                                    ((OutputVertex)vertices.ElementAt(v.GetId())).SetEdge(e1 == null ? e2 : e1); 
                                     break;
                                 }
                             case VertexType.DEADEND:
@@ -263,7 +263,7 @@ namespace SolverLibrary.JsonDoc
     }
     public class TypePrefixEnumConverter : StringEnumConverter
     {
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             bool isNullable = (Nullable.GetUnderlyingType(objectType) != null);
             Type enumType = (Nullable.GetUnderlyingType(objectType) ?? objectType);

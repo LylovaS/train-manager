@@ -6,11 +6,11 @@ namespace SolverLibrary.Model.Graph
     public class Edge
     {
         private int length;
-        private Vertex start, end;
+        private Vertex? start, end;
         private bool blocked;
         private TrainType edgeType;
 
-        public Edge(int length, Vertex start, Vertex end, TrainType edgeType)
+        public Edge(int length, Vertex? start, Vertex? end, TrainType edgeType)
         {
             SetLength(length);
             this.start = start;
@@ -27,10 +27,10 @@ namespace SolverLibrary.Model.Graph
             }
             this.length = length;
         }
-        public Vertex GetStart() { return start; }
-        public void SetStart(Vertex start) { this.start = start; }
-        public Vertex GetEnd() { return end; }
-        public void SetEnd(Vertex end) { this.end = end; }
+        public Vertex? GetStart() { return start; }
+        public void SetStart(Vertex? start) { this.start = start; }
+        public Vertex? GetEnd() { return end; }
+        public void SetEnd(Vertex? end) { this.end = end; }
         public bool IsBlocked() { return blocked; }
         public void Block() { blocked = true; }
         public void Unblock() { blocked = false; }
