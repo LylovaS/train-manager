@@ -14,14 +14,14 @@ namespace SolverLibrary.Model
     {
         private List<SwitchPlanUnit> SwitchUnits = new List<SwitchPlanUnit>();
         private List<TrafficLightPlanUnit> TrafficUnits = new List<TrafficLightPlanUnit>();
-        public readonly Dictionary<Train, Edge> trainPlatforms = new();
+        public readonly Dictionary<Tuple<Train, SingleTrainSchedule>, Edge> trainPlatforms = new();
 
         public StationWorkPlan() { }
 
 
-        internal void AddTrainWithPlatform(Train train, Edge platform)
+        internal void AddTrainWithPlatform(Train train, SingleTrainSchedule schedule,Edge platform)
         {
-            trainPlatforms[train] = platform;
+            trainPlatforms[new(train, schedule)] = platform;
         }
         internal void AddSwitchPlanUnit(SwitchPlanUnit switchPlanUnit)
         {

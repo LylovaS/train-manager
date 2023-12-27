@@ -1,0 +1,38 @@
+﻿[
+  {
+    "train": {
+      "length": 450,
+      "speed": 3,
+      "trainType": "TrainType_CARGO"
+    },
+    "timeArrival": 0,
+    "timeDeparture": 3600,
+    "timeStop": 2400,
+    "vertexIn": 1,
+    "vertexOut": 26
+  },
+  {
+    "train": {
+      "length": 400,
+      "speed": 3,
+      "trainType": "TrainType_CARGO"
+    },
+    "timeArrival": 1000,
+    "timeDeparture": 3800,
+    "timeStop": 2400,
+    "vertexIn": 1,
+    "vertexOut": 26
+  },
+  {
+    "train": {
+      "length": 600,
+      "speed": 3,
+      "trainType": "TrainType_PASSENGER"
+    },
+    "timeArrival": 0,
+    "timeDeparture": 3600,
+    "timeStop": 2400,
+    "vertexIn": 27,
+    "vertexOut": 0
+  }
+]

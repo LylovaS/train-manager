@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
+using SolverLibrary.Model.PlanUnit;
 
 namespace SolverLibrary
 {
@@ -224,9 +225,80 @@ namespace SolverLibrary
                     if (solver.Value(trainGoesThroughPlatf[trainId[train], platform]) == 1)
                     {
                         var tmp = trainConditionPaths[trainId[train], platform].Item1.GetVertices();
-                        plan.AddTrainWithPlatform(train, findEdge(tmp[tmp.Count - 1], tmp[tmp.Count - 2]));
+                        plan.AddTrainWithPlatform(train, dictSchedule[train], findEdge(tmp[tmp.Count - 1], tmp[tmp.Count - 2]));
                     }
                 }
+            }
+            
+            foreach (Train train in dictSchedule.Keys)
+            {
+                var trainSchedule = dictSchedule[train];
+                int platform = -1;
+                for (int j = 0; j < platformsCnt; ++j)
+                {
+                    if (solver.Value(trainGoesThroughPlatf[trainId[train], j]) == 1)
+                    {
+                        platform = j; break;  
+                    }
+                }
+                var vertices = trainConditionPaths[trainId[train], platform].Item1.GetVertices();
+                int t = (trainConditionPaths[trainId[train], platform].Item1.length + train.GetSpeed() - 1) / train.GetSpeed();
+                for (int i = 1; i + 1 < vertices.Count; ++i)
+                {
+                    if (vertices[i].GetVertexType() == VertexType.TRAFFIC)
+                    {
+                        TrafficLightPlanUnit planUnit = new((TrafficLightVertex)vertices[i],
+                            trainSchedule.GetTimeArrival() - timeInaccuracy,
+                            trainSchedule.GetTimeArrival() + t + timeInaccuracy,
+                            TrafficLightStatus.PASSING);
+                        plan.AddTrafficLightPlanUnit(planUnit);
+                    }
+                    if (vertices[i].GetVertexType() == VertexType.SWITCH)
+                    {
+                        SwitchStatus switchStatus = SwitchStatus.PASSINGCON2;
+                        SwitchVertex v = (SwitchVertex)vertices[i];
+                        if (hasEdgeThatEndings(v.GetEdgeConnections()[0].Item1, new(vertices[i - 1], vertices[i])) &&
+                            hasEdgeThatEndings(v.GetEdgeConnections()[0].Item2, new(vertices[i + 1], vertices[i])))
+                        {
+                            switchStatus = SwitchStatus.PASSINGCON1;
+                        }
+                        if (hasEdgeThatEndings(v.GetEdgeConnections()[0].Item1, new(vertices[i + 1], vertices[i])) &&
+                            hasEdgeThatEndings(v.GetEdgeConnections()[0].Item2, new(vertices[i - 1], vertices[i])))
+                        {
+                            switchStatus = SwitchStatus.PASSINGCON1;
+                        }
+                        SwitchPlanUnit planUnit = new(v,
+                            trainSchedule.GetTimeArrival() - timeInaccuracy,
+                            trainSchedule.GetTimeArrival() + t + timeInaccuracy,
+                            switchStatus);
+                        plan.AddSwitchPlanUnit(planUnit);
+                    }
+                }
+            }
+            Dictionary<TrafficLightVertex, int> pastTime = new();
+            List<TrafficLightPlanUnit> planUnits = new();
+            foreach (var unit in plan.GetTrafficLightPlanUnits())
+            {
+                TrafficLightVertex v = unit.GetVertex();
+                if (pastTime.ContainsKey(v))
+                {
+                    if (unit.GetBeginTime() - 1 >= pastTime[v] + 1)
+                    {
+                        planUnits.Add(new(v, pastTime[v] + 1, unit.GetBeginTime() - 1, TrafficLightStatus.STOP));
+                    }
+                } else
+                {
+                    planUnits.Add(new(v, int.MinValue, unit.GetBeginTime() - 1, TrafficLightStatus.STOP));
+                }
+                pastTime[v] = unit.GetEndTime();
+            }
+            foreach (var trLight in pastTime.Keys)
+            {
+                planUnits.Add(new(trLight, pastTime[trLight] + 1, int.MaxValue, TrafficLightStatus.STOP));
+            }
+            foreach (var unit in planUnits)
+            {
+                plan.AddTrafficLightPlanUnit(unit);
             }
 
             return plan;

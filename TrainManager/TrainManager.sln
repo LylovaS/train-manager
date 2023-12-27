@@ -5,9 +5,11 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolverLibrary", "SolverLibrary\SolverLibrary.csproj", "{761DE779-3DA2-4B7D-A998-6E7BA4342064}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulatorLibrary", "SimulatorLibrary\SimulatorLibrary.csproj", "{1865B566-DCD7-4E9B-BA7A-DCA19F8542A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimulatorLibrary", "SimulatorLibrary\SimulatorLibrary.csproj", "{1865B566-DCD7-4E9B-BA7A-DCA19F8542A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolverLibraryTests", "SolverLibraryTests\SolverLibraryTests.csproj", "{C3E88A78-C52C-4798-8269-373C48D4CA1E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolverLibraryTests", "SolverLibraryTests\SolverLibraryTests.csproj", "{C3E88A78-C52C-4798-8269-373C48D4CA1E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationApp", "PresentationApp\PresentationApp.csproj", "{7913A86E-46B4-4FD4-AB11-0A3CFA9B729B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{C3E88A78-C52C-4798-8269-373C48D4CA1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3E88A78-C52C-4798-8269-373C48D4CA1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3E88A78-C52C-4798-8269-373C48D4CA1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7913A86E-46B4-4FD4-AB11-0A3CFA9B729B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7913A86E-46B4-4FD4-AB11-0A3CFA9B729B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7913A86E-46B4-4FD4-AB11-0A3CFA9B729B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7913A86E-46B4-4FD4-AB11-0A3CFA9B729B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
