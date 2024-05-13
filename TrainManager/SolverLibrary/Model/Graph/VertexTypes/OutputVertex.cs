@@ -8,7 +8,7 @@ namespace SolverLibrary.Model.Graph.VertexTypes
         public void SetEdge(Edge edge)
         {
             edgeConnections.Clear();
-            edgeConnections.Add(new Tuple<Edge?, Edge?>(null, edge));
+            edgeConnections.Add(new Tuple<Edge?, Edge?>(edge, null));
         }
     }
 }

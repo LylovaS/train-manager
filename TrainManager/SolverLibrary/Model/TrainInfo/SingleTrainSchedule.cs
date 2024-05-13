@@ -3,14 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using SolverLibrary.Model.Graph.VertexTypes;
 
 namespace SolverLibrary.Model.TrainInfo
 {
     public class SingleTrainSchedule
     {
-        private int timeArrival, timeDeparture, timeStop;
+        [JsonProperty]
+        private int timeArrival;
+        [JsonProperty]
+        private int timeDeparture;
+        [JsonProperty]
+        private int timeStop;
+        [JsonProperty]
         private InputVertex vertexIn;
+        [JsonProperty]
         private OutputVertex vertexOut;
 
         public SingleTrainSchedule(int timeArrival, int timeDeparture, int timeStop, InputVertex vertexIn, OutputVertex vertexOut)

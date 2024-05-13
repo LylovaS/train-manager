@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using SolverLibrary.Model.Graph;
 using SolverLibrary.Model.Graph.VertexTypes;
 using SolverLibrary.Model.PlanUnit;
@@ -14,6 +15,7 @@ namespace SolverLibrary.Model
     {
         private List<SwitchPlanUnit> SwitchUnits = new List<SwitchPlanUnit>();
         private List<TrafficLightPlanUnit> TrafficUnits = new List<TrafficLightPlanUnit>();
+        [JsonProperty]
         public readonly Dictionary<Tuple<Train, SingleTrainSchedule>, Edge> trainPlatforms = new();
 
         public StationWorkPlan() { }

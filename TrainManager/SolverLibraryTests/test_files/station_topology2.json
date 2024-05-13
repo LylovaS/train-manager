@@ -331,192 +331,224 @@
   ],
   "edges": [
     {
+      "id": 0,
       "length": 50,
       "startId": 25,
       "endId": 26,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 1,
       "length": 50,
       "startId": 0,
       "endId": 2,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 2,
       "length": 50,
       "startId": 1,
       "endId": 3,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 3,
       "length": 70,
       "startId": 3,
       "endId": 5,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 4,
       "length": 100,
       "startId": 2,
       "endId": 4,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 5,
       "length": 40,
       "startId": 4,
       "endId": 6,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 6,
       "length": 70,
       "startId": 5,
       "endId": 7,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 7,
       "length": 100,
       "startId": 6,
       "endId": 8,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 8,
       "length": 70,
       "startId": 7,
       "endId": 12,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 9,
       "length": 60,
       "startId": 12,
       "endId": 11,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 10,
       "length": 700,
       "startId": 11,
       "endId": 16,
       "edgeType": "TrainType_PASSENGER"
     },
     {
+      "id": 11,
       "length": 700,
       "startId": 10,
       "endId": 17,
       "edgeType": "TrainType_PASSENGER"
     },
     {
+      "id": 12,
       "length": 60,
       "startId": 8,
       "endId": 10,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 13,
       "length": 60,
       "startId": 8,
       "endId": 9,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 14,
       "length": 400,
       "startId": 9,
       "endId": 18,
       "edgeType": "TrainType_CARGO"
     },
     {
+      "id": 15,
       "length": 100,
       "startId": 18,
       "endId": 19,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 16,
       "length": 50,
       "startId": 17,
       "endId": 19,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 17,
       "length": 60,
       "startId": 16,
       "endId": 15,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 18,
       "length": 100,
       "startId": 14,
       "endId": 15,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 19,
       "length": 500,
       "startId": 13,
       "endId": 14,
       "edgeType": "TrainType_CARGO"
     },
     {
+      "id": 20,
       "length": 100,
       "startId": 12,
       "endId": 13,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 21,
       "length": 70,
       "startId": 19,
       "endId": 20,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 22,
       "length": 50,
       "startId": 15,
       "endId": 21,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 23,
       "length": 100,
       "startId": 21,
       "endId": 22,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 24,
       "length": 50,
       "startId": 20,
       "endId": 23,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 25,
       "length": 100,
       "startId": 23,
       "endId": 24,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 26,
       "length": 50,
       "startId": 24,
       "endId": 27,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 27,
       "length": 40,
       "startId": 22,
       "endId": 25,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 28,
       "length": 40,
       "startId": 5,
       "endId": 4,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 29,
       "length": 40,
       "startId": 6,
       "endId": 7,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 30,
       "length": 40,
       "startId": 20,
       "endId": 21,
       "edgeType": "TrainType_NONE"
     },
     {
+      "id": 31,
       "length": 40,
       "startId": 22,
       "endId": 23,

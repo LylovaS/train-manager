@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using SolverLibrary.Model.Graph.VertexTypes;
 using SolverLibrary.Model.TrainInfo;
 
@@ -10,7 +11,9 @@ namespace SolverLibrary.Model.Graph
 {
     public class StationGraph
     {
+        [JsonProperty(Order = 1)]
         private HashSet<Vertex> vertices;
+        [JsonProperty(Order = 2)]
         private HashSet<Edge> edges;
         private HashSet<InputVertex> inputVertices;
         private HashSet<OutputVertex> outputVertices;
@@ -137,6 +140,7 @@ namespace SolverLibrary.Model.Graph
         }
 
         public HashSet<Vertex> GetVertices() { return vertices; }
+        public HashSet<Edge> GetEdges() { return edges; }
         public HashSet<InputVertex> GetInputVertices() { return inputVertices; }
         public HashSet<OutputVertex> GetOutputVertices() { return outputVertices; }
     }
