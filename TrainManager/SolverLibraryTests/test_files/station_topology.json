@@ -1,0 +1,33 @@
+﻿{
+  "vertices": [
+    {
+      "id": 0,
+      "vertexType": "VertexType_INPUT",
+      "edgeConnections": [
+        {
+          "item1": -1,
+          "item2": 0
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "vertexType": "VertexType_OUTPUT",
+      "edgeConnections": [
+        {
+          "item1": 0,
+          "item2": -1
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": 0,
+      "length": 10,
+      "startId": 0,
+      "endId": 1,
+      "edgeType": "TrainType_NONE"
+    }
+  ]
+}

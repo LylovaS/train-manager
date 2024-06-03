@@ -1,0 +1,558 @@
+﻿{
+  "vertices": [
+    {
+      "id": 0,
+      "vertexType": "VertexType_OUTPUT",
+      "edgeConnections": [
+        {
+          "item1": 1,
+          "item2": -1
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "vertexType": "VertexType_INPUT",
+      "edgeConnections": [
+        {
+          "item1": -1,
+          "item2": 2
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "vertexType": "VertexType_TRAFFIC",
+      "edgeConnections": [
+        {
+          "item1": 1,
+          "item2": 4
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "vertexType": "VertexType_TRAFFIC",
+      "edgeConnections": [
+        {
+          "item1": 2,
+          "item2": 3
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "vertexType": "VertexType_SWITCH",
+      "edgeConnections": [
+        {
+          "item1": 5,
+          "item2": 4
+        },
+        {
+          "item1": 5,
+          "item2": 28
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "vertexType": "VertexType_SWITCH",
+      "edgeConnections": [
+        {
+          "item1": 3,
+          "item2": 6
+        },
+        {
+          "item1": 3,
+          "item2": 28
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "vertexType": "VertexType_SWITCH",
+      "edgeConnections": [
+        {
+          "item1": 5,
+          "item2": 7
+        },
+        {
+          "item1": 5,
+          "item2": 29
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "vertexType": "VertexType_SWITCH",
+      "edgeConnections": [
+        {
+          "item1": 8,
+          "item2": 29
+        },
+        {
+          "item1": 8,
+          "item2": 6
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "vertexType": "VertexType_SWITCH",
+      "edgeConnections": [
+        {
+          "item1": 7,
+          "item2": 13
+        },
+        {
+          "item1": 7,
+          "item2": 12
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "vertexType": "VertexType_TRAFFIC",
+      "edgeConnections": [
+        {
+          "item1": 13,
+          "item2": 14
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "vertexType": "VertexType_TRAFFIC",
+      "edgeConnections": [
+        {
+          "item1": 12,
+          "item2": 11
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "vertexType": "VertexType_TRAFFIC",
+      "edgeConnections": [
+        {
+          "item1": 9,
+          "item2": 10
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "vertexType": "VertexType_SWITCH",
+      "edgeConnections": [
+        {
+          "item1": 8,
+          "item2": 9
+        },
+        {
+          "item1": 8,
+          "item2": 20
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "vertexType": "VertexType_TRAFFIC",
+      "edgeConnections": [
+        {
+          "item1": 20,
+          "item2": 19
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "vertexType": "VertexType_TRAFFIC",
+      "edgeConnections": [
+        {
+          "item1": 19,
+          "item2": 18
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "vertexType": "VertexType_SWITCH",
+      "edgeConnections": [
+        {
+          "item1": 22,
+          "item2": 17
+        },
+        {
+          "item1": 22,
+          "item2": 18
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "vertexType": "VertexType_TRAFFIC",
+      "edgeConnections": [
+        {
+          "item1": 10,
+          "item2": 17
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "vertexType": "VertexType_TRAFFIC",
+      "edgeConnections": [
+        {
+          "item1": 11,
+          "item2": 16
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "vertexType": "VertexType_TRAFFIC",
+      "edgeConnections": [
+        {
+          "item1": 14,
+          "item2": 15
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "vertexType": "VertexType_SWITCH",
+      "edgeConnections": [
+        {
+          "item1": 21,
+          "item2": 15
+        },
+        {
+          "item1": 21,
+          "item2": 16
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "vertexType": "VertexType_SWITCH",
+      "edgeConnections": [
+        {
+          "item1": 24,
+          "item2": 21
+        },
+        {
+          "item1": 24,
+          "item2": 30
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "vertexType": "VertexType_SWITCH",
+      "edgeConnections": [
+        {
+          "item1": 22,
+          "item2": 23
+        },
+        {
+          "item1": 22,
+          "item2": 30
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "vertexType": "VertexType_SWITCH",
+      "edgeConnections": [
+        {
+          "item1": 27,
+          "item2": 23
+        },
+        {
+          "item1": 27,
+          "item2": 31
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "vertexType": "VertexType_SWITCH",
+      "edgeConnections": [
+        {
+          "item1": 24,
+          "item2": 25
+        },
+        {
+          "item1": 24,
+          "item2": 31
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "vertexType": "VertexType_TRAFFIC",
+      "edgeConnections": [
+        {
+          "item1": 25,
+          "item2": 26
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "vertexType": "VertexType_TRAFFIC",
+      "edgeConnections": [
+        {
+          "item1": 27,
+          "item2": 0
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "vertexType": "VertexType_OUTPUT",
+      "edgeConnections": [
+        {
+          "item1": 0,
+          "item2": -1
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "vertexType": "VertexType_INPUT",
+      "edgeConnections": [
+        {
+          "item1": -1,
+          "item2": 26
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": 0,
+      "length": 50,
+      "startId": 25,
+      "endId": 26,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 1,
+      "length": 50,
+      "startId": 0,
+      "endId": 2,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 2,
+      "length": 50,
+      "startId": 1,
+      "endId": 3,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 3,
+      "length": 70,
+      "startId": 3,
+      "endId": 5,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 4,
+      "length": 100,
+      "startId": 2,
+      "endId": 4,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 5,
+      "length": 40,
+      "startId": 4,
+      "endId": 6,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 6,
+      "length": 70,
+      "startId": 5,
+      "endId": 7,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 7,
+      "length": 100,
+      "startId": 6,
+      "endId": 8,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 8,
+      "length": 70,
+      "startId": 7,
+      "endId": 12,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 9,
+      "length": 60,
+      "startId": 12,
+      "endId": 11,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 10,
+      "length": 700,
+      "startId": 11,
+      "endId": 16,
+      "edgeType": "TrainType_PASSENGER"
+    },
+    {
+      "id": 11,
+      "length": 700,
+      "startId": 10,
+      "endId": 17,
+      "edgeType": "TrainType_PASSENGER"
+    },
+    {
+      "id": 12,
+      "length": 60,
+      "startId": 8,
+      "endId": 10,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 13,
+      "length": 60,
+      "startId": 8,
+      "endId": 9,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 14,
+      "length": 400,
+      "startId": 9,
+      "endId": 18,
+      "edgeType": "TrainType_CARGO"
+    },
+    {
+      "id": 15,
+      "length": 100,
+      "startId": 18,
+      "endId": 19,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 16,
+      "length": 50,
+      "startId": 17,
+      "endId": 19,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 17,
+      "length": 60,
+      "startId": 16,
+      "endId": 15,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 18,
+      "length": 100,
+      "startId": 14,
+      "endId": 15,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 19,
+      "length": 500,
+      "startId": 13,
+      "endId": 14,
+      "edgeType": "TrainType_CARGO"
+    },
+    {
+      "id": 20,
+      "length": 100,
+      "startId": 12,
+      "endId": 13,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 21,
+      "length": 70,
+      "startId": 19,
+      "endId": 20,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 22,
+      "length": 50,
+      "startId": 15,
+      "endId": 21,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 23,
+      "length": 100,
+      "startId": 21,
+      "endId": 22,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 24,
+      "length": 50,
+      "startId": 20,
+      "endId": 23,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 25,
+      "length": 100,
+      "startId": 23,
+      "endId": 24,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 26,
+      "length": 50,
+      "startId": 24,
+      "endId": 27,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 27,
+      "length": 40,
+      "startId": 22,
+      "endId": 25,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 28,
+      "length": 40,
+      "startId": 5,
+      "endId": 4,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 29,
+      "length": 40,
+      "startId": 6,
+      "endId": 7,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 30,
+      "length": 40,
+      "startId": 20,
+      "endId": 21,
+      "edgeType": "TrainType_NONE"
+    },
+    {
+      "id": 31,
+      "length": 40,
+      "startId": 22,
+      "endId": 23,
+      "edgeType": "TrainType_NONE"
+    }
+  ]
+}
