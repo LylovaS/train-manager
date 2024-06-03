@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using SolverLibrary.Model.Graph;
 using SolverLibrary.Model.Graph.VertexTypes;
 using SolverLibrary.Model.TrainInfo;
@@ -24,6 +25,11 @@ namespace SolverLibrary.Model
             this.stationGraph = stationGraph;
             schedule = new Dictionary<Train, SingleTrainSchedule>(capacity);
             trainTypes = new HashSet<TrainType>(stationGraph.GetEdgeTypes());
+        }
+
+        public Dictionary<Train, SingleTrainSchedule> GetSchedule()
+        {
+            return schedule;
         }
 
         public bool SetStationGraph(StationGraph stationGraph)
@@ -89,11 +95,6 @@ namespace SolverLibrary.Model
                 }
             }
             return true;
-        }
-
-        public Dictionary<Train, SingleTrainSchedule> GetSchedule()
-        {
-            return schedule;
         }
     }
 }

@@ -13,7 +13,10 @@ namespace MyApp
         static void Main(string[] args)
         {
             StationGraph graph = JsonParser.LoadJsonStationGraph("./station_topology.json");
+            JsonParser.SaveJsonStationGraph("./SAVED_station_topology.json", graph);
+
             TrainSchedule schedule = JsonParser.LoadJsonTrainSchedule("./train_schedule.json", graph);
+            JsonParser.SaveJsonTrainSchedule("./SAVED_train_schedule.json", schedule);
 
             Solver solver = new(graph, 5);
             var workPlan = solver.CalculateWorkPlan(schedule);
@@ -27,6 +30,7 @@ namespace MyApp
                     $"timeArrival={trainSchedule.GetTimeArrival()}, timeDeparture={trainSchedule.GetTimeDeparture()})" +
                     $" stops on platfrom Edge(start={trainPlatforms[i].GetStart().getId()}, start={trainPlatforms[i].GetEnd().getId()})");
             }
+            JsonParser.SaveJsonStationWorkPlan("./SAVED_station_work_plan.json", workPlan);
         }
     }
 }

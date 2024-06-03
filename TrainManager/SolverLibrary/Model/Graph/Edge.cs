@@ -1,23 +1,34 @@
 ﻿using SolverLibrary.Model.TrainInfo;
 using SolverLibrary.Model.Graph.VertexTypes;
+using Newtonsoft.Json;
 
 namespace SolverLibrary.Model.Graph
 {
     public class Edge
     {
+        [JsonProperty(Order = 1)]
+        private int id;
+        [JsonProperty(Order = 2)]
         private int length;
-        private Vertex? start, end;
+        [JsonProperty(PropertyName = "startId", Order = 3)]
+        private Vertex? start;
+        [JsonProperty(PropertyName = "endId", Order = 3)]
+        private Vertex? end;
         private bool blocked;
+        [JsonProperty(Order = 5)]
         private TrainType edgeType;
 
-        public Edge(int length, Vertex? start, Vertex? end, TrainType edgeType)
+        [JsonConstructor]
+        public Edge(int id, int length, Vertex? start, Vertex? end, TrainType edgeType)
         {
+            this.id = id;
             SetLength(length);
             this.start = start;
             this.end = end;
             this.edgeType = edgeType;
             blocked = false;
         }
+        public int getId() { return id; }
         public int GetLength() { return length; }
         public void SetLength(int length)
         {

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SolverLibrary;
 
 namespace SolverLibraryTests
 {
@@ -52,6 +53,39 @@ namespace SolverLibraryTests
             Assert.AreEqual(0, schedule[0].GetSingleTrainSchedule().GetTimeArrival());
             Assert.AreEqual(5, schedule[0].GetSingleTrainSchedule().GetTimeDeparture());
             Assert.AreEqual(4, schedule[0].GetSingleTrainSchedule().GetTimeStop());*/
+        }
+        [TestMethod]
+        public void SimpleStationWorkPlanTest()
+        {
+            StationGraph graph = JsonParser.LoadJsonStationGraph("./test_files/station_topology2.json");
+            TrainSchedule schedule = JsonParser.LoadJsonTrainSchedule("./test_files/schedule2.json", graph);
+
+            Solver solver = new(graph, 5);
+            var workPlan = solver.CalculateWorkPlan(schedule);
+            var trainPlatforms = workPlan.trainPlatforms;
+            JsonParser.SaveJsonStationWorkPlan("./SAVED_station_work_plan.json", workPlan);
+
+            StationWorkPlan parsedWorkPlan = JsonParser.LoadJsonStationWorkPlan("./SAVED_station_work_plan.json", graph);
+            var parsedTrainPlatforms = parsedWorkPlan.trainPlatforms;
+            for (int i = 0; i < parsedTrainPlatforms.Count; i++)
+            {
+                Tuple<Train, SingleTrainSchedule> solved = trainPlatforms.Keys.ElementAt(i);
+                Tuple<Train, SingleTrainSchedule> parsed = parsedTrainPlatforms.Keys.ElementAt(i);
+
+                Train train = solved.Item1;
+                SingleTrainSchedule trainSchedule = solved.Item2;
+                Train parsedTrain = parsed.Item1;
+                SingleTrainSchedule parsedTrainSchedule = parsed.Item2;
+                Assert.AreEqual(train.GetLength(), parsedTrain.GetLength());
+                Assert.AreEqual(trainSchedule.GetVertexIn().getId(), parsedTrainSchedule.GetVertexIn().getId());
+                Assert.AreEqual(trainSchedule.GetVertexOut().getId(), parsedTrainSchedule.GetVertexOut().getId());
+                Assert.AreEqual(train.GetTrainType(), parsedTrain.GetTrainType());
+                Assert.AreEqual(trainSchedule.GetTimeArrival(), parsedTrainSchedule.GetTimeArrival());
+                Assert.AreEqual(trainSchedule.GetTimeDeparture(), parsedTrainSchedule.GetTimeDeparture());
+                Assert.AreEqual(trainPlatforms[solved].GetStart()?.getId(), parsedTrainPlatforms[parsed].GetStart()?.getId());
+                Assert.AreEqual(trainPlatforms[solved].GetEnd()?.getId(), parsedTrainPlatforms[parsed].GetEnd()?.getId());
+
+            }
         }
     }
 }

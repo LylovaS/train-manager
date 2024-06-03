@@ -23,6 +23,7 @@
   ],
   "edges": [
     {
+      "id": 0,
       "length": 10,
       "startId": 0,
       "endId": 1,

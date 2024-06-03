@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,11 @@ namespace SolverLibrary.Model.TrainInfo
     public enum TrainType { PASSENGER, CARGO, NONE };
     public class Train
     {
-        private int length, speed;
+        [JsonProperty(Order = 1)]
+        private int length;
+        [JsonProperty(Order = 2)]
+        private int speed;
+        [JsonProperty(Order = 3)]
         private TrainType trainType;
         public Train(int length, int speed, TrainType trainType)
         {

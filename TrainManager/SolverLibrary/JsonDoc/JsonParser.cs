@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using SolverLibrary.Model;
@@ -21,7 +16,6 @@ namespace SolverLibrary.JsonDoc
             {
                 string json = sr.ReadToEnd();
                 var settings = new JsonSerializerSettings { Converters = new JsonConverter[] { new TypePrefixEnumConverter() } };
-                //var json = JsonConvert.DeserializeObject<List<Train>>(Formatting.Indented, settings);
                 List<Train>? trains = JsonConvert.DeserializeObject<List<Train>>(json, settings);
                 sr.Close();
                 if (trains != null)
@@ -37,7 +31,9 @@ namespace SolverLibrary.JsonDoc
 
         public class JsonStationGraph
         {
+            [JsonProperty(Order = 1)]
             private List<JsonVertex> vertices;
+            [JsonProperty(Order = 2)]
             private List<JsonEdge> edges;
             public JsonStationGraph(List<JsonVertex> vertices, List<JsonEdge> edges)
             {
@@ -49,8 +45,11 @@ namespace SolverLibrary.JsonDoc
         }
         public class JsonVertex
         {
+            [JsonProperty(Order = 1)]
             private int id;
+            [JsonProperty(Order = 2)]
             private VertexType vertexType;
+            [JsonProperty(Order = 3)]
             private List<Tuple<int, int>> edgeConnections;
 
             public JsonVertex(int id, VertexType vertexType, List<Tuple<int, int>> edgeConnections)
@@ -66,18 +65,26 @@ namespace SolverLibrary.JsonDoc
         }
         public class JsonEdge
         {
+            [JsonProperty(Order = 1)]
+            private int id;
+            [JsonProperty(Order = 2)]
             private int length;
+            [JsonProperty(Order = 3)]
             private int startId;
+            [JsonProperty(Order = 4)]
             private int endId;
+            [JsonProperty(Order = 5)]
             private TrainType edgeType;
 
-            public JsonEdge(int length, int startId, int endId, TrainType edgeType)
+            public JsonEdge(int id, int length, int startId, int endId, TrainType edgeType)
             {
+                this.id = id;
                 this.length = length;
                 this.startId = startId;
                 this.endId = endId;
                 this.edgeType = edgeType;
             }
+            public int GetId() { return id; }
             public int GetLength() { return length; }
             public int GetStartId() { return startId; }
             public int GetEndId() { return endId; }
@@ -89,7 +96,9 @@ namespace SolverLibrary.JsonDoc
             using (StreamReader sr = new StreamReader(filename))
             {
                 string json = sr.ReadToEnd();
-                var settings = new JsonSerializerSettings { Converters = new JsonConverter[] { new TypePrefixEnumConverter() } };
+                var settings = new JsonSerializerSettings { Converters = new JsonConverter[] { 
+                    new TypePrefixEnumConverter()
+                } };
                 JsonStationGraph? jsonGraph = JsonConvert.DeserializeObject<JsonStationGraph>(json, settings);
                 sr.Close();
                 if (jsonGraph != null)
@@ -135,7 +144,7 @@ namespace SolverLibrary.JsonDoc
                     List<Edge> edges = new List<Edge>();
                     foreach (JsonEdge e in jsonGraph.GetEdges())
                     {
-                        edges.Add(new Edge(e.GetLength(),
+                        edges.Add(new Edge(e.GetId(), e.GetLength(),
                             vertices.ElementAt(e.GetStartId()),
                             vertices.ElementAt(e.GetEndId()),
                             e.GetEdgeType()));
@@ -205,11 +214,73 @@ namespace SolverLibrary.JsonDoc
             }
         }
 
+        public static void SaveJsonStationGraph(string filename, StationGraph stationGraph)
+        {
+            using (StreamWriter sw = new StreamWriter(filename))
+            {
+                var settings = new JsonSerializerSettings { 
+                    Converters = new JsonConverter[] { new TypePrefixEnumConverter() }
+                };
+                List<JsonVertex> jVertices = new List<JsonVertex>();
+                foreach (Vertex v in stationGraph.GetVertices())
+                {
+                    List<Tuple<int,int>> edgeConnections = new List<Tuple<int,int>>();
+                    foreach(Tuple<Edge?, Edge?> pair in v.GetEdgeConnections())
+                    {
+                        edgeConnections.Add(new Tuple<int, int>(
+                            pair.Item1?.getId() == null ? -1 : pair.Item1.getId(),
+                            pair.Item2?.getId() == null ? -1 : pair.Item2.getId()));
+                    }
+                    jVertices.Add(new JsonVertex(
+                        v.getId(),
+                        v.GetVertexType(),
+                        edgeConnections
+                        ));
+                }
+                List<JsonEdge> jEdges = new List<JsonEdge>();
+                foreach (Edge e in stationGraph.GetEdges())
+                {
+                    jEdges.Add(new JsonEdge(
+                        e.getId(),
+                        e.GetLength(), 
+                        e.GetStart().getId(), 
+                        e.GetEnd().getId(), 
+                        e.GetEdgeType()
+                        ));
+                }
+                JsonStationGraph jGraph = new JsonStationGraph(
+                    jVertices.OrderBy(v => v.GetId()).ToList(), 
+                    jEdges.OrderBy(e => e.GetId()).ToList());
+
+                string json = JsonConvert.SerializeObject(jGraph, Formatting.Indented, settings);
+                if (json != null)
+                {
+                    sw.Write(json);
+                    sw.Close();
+                    return;
+                }
+                else
+                {
+                    sw.Close();
+                    throw new Exception("Couldn't serialize station topology.");
+                }
+            }
+        }
+
         public class JsonSingleSchedule
         {
+            [JsonProperty(Order = 1)]
             private Train train;
-            private int timeArrival, timeDeparture, timeStop;
-            private int vertexIn, vertexOut;
+            [JsonProperty(Order = 2)]
+            private int timeArrival;
+            [JsonProperty(Order = 3)]
+            private int timeDeparture;
+            [JsonProperty(Order = 4)]
+            private int timeStop;
+            [JsonProperty(Order = 5)]
+            private int vertexIn;
+            [JsonProperty(Order = 6)]
+            private int vertexOut;
 
             public JsonSingleSchedule(Train train, int timeArrival, int timeDeparture, int timeStop, int vertexIn, int vertexOut)
             {
@@ -260,6 +331,149 @@ namespace SolverLibrary.JsonDoc
                 }
             }
         }
+
+        public static void SaveJsonTrainSchedule(string filename, TrainSchedule trainSchedule)
+        {
+            using (StreamWriter sw = new StreamWriter(filename))
+            {
+                var settings = new JsonSerializerSettings
+                {
+                    Converters = new JsonConverter[] { new TypePrefixEnumConverter() }
+                };
+                List<JsonSingleSchedule> jSchedule = new List<JsonSingleSchedule>();
+                foreach (KeyValuePair<Train, SingleTrainSchedule> pair in trainSchedule.GetSchedule())
+                {
+                    JsonSingleSchedule jss = new JsonSingleSchedule(
+                        pair.Key,
+                        pair.Value.GetTimeArrival(),
+                        pair.Value.GetTimeDeparture(),
+                        pair.Value.GetTimeStop(),
+                        pair.Value.GetVertexIn().getId(),
+                        pair.Value.GetVertexOut().getId());
+                    jSchedule.Add(jss);
+                }
+
+                string json = JsonConvert.SerializeObject(jSchedule, Formatting.Indented, settings);
+                if (json != null)
+                {
+                    sw.Write(json);
+                    sw.Close();
+                    return;
+                }
+                else
+                {
+                    sw.Close();
+                    throw new Exception("Couldn't serialize train schedule.");
+                }
+            }
+        }
+
+        public class JsonSingleStationWorkPlan
+        {
+            [JsonProperty(Order = 1)]
+            private JsonSingleSchedule schedule;
+            [JsonProperty(Order = 2)]
+            private JsonEdge edge;
+
+            public JsonSingleStationWorkPlan(JsonSingleSchedule schedule, JsonEdge edge)
+            {
+                this.schedule = schedule;
+                this.edge = edge;
+            }
+            public JsonSingleSchedule GetSchedule() { return schedule; }
+            public JsonEdge GetEdge() { return edge; }
+        }
+
+        public static StationWorkPlan LoadJsonStationWorkPlan(string filename, StationGraph stationGraph)
+        {
+            using (StreamReader sr = new StreamReader(filename))
+            {
+                string json = sr.ReadToEnd();
+                var settings = new JsonSerializerSettings
+                {
+                    Converters = new JsonConverter[] {
+                        new TypePrefixEnumConverter()
+                }
+                };
+                List<JsonSingleStationWorkPlan> jWorkPlan = JsonConvert.DeserializeObject<List<JsonSingleStationWorkPlan>>(json, settings);
+                StationWorkPlan workPlan = new StationWorkPlan();
+                List<Vertex> vertices = stationGraph.GetVertices().ToList();
+                foreach (JsonSingleStationWorkPlan p in jWorkPlan)
+                {
+                    JsonSingleSchedule jsonSchedule = p.GetSchedule();
+                    InputVertex? v1 = (InputVertex?)vertices.Find((Vertex v) => { return v.getId().Equals(jsonSchedule.GetVertexIn()); });
+                    OutputVertex? v2 = (OutputVertex?)vertices.Find((Vertex v) => { return v.getId().Equals(jsonSchedule.GetVertexOut()); });
+                    Edge? edge = stationGraph.GetEdges().ToList().Find((Edge e) => { return e.getId().Equals(p.GetEdge().GetId()); });
+                    if (v1 != null && v2 != null && edge != null)
+                    {
+                        SingleTrainSchedule schedule = new SingleTrainSchedule(jsonSchedule.GetTimeArrival(),
+                            jsonSchedule.GetTimeDeparture(), jsonSchedule.GetTimeStop(),
+                            v1, v2);
+                        workPlan.AddTrainWithPlatform(p.GetSchedule().GetTrain(), schedule, edge);
+                    }
+                }
+                sr.Close();
+                if (workPlan != null)
+                {
+                    return workPlan;
+                }
+                else
+                {
+                    throw new Exception("Couldn't deserialize train schedule.");
+                }
+            }
+        }
+
+        public static void SaveJsonStationWorkPlan(string filename, StationWorkPlan workPlan)
+        {
+            using (StreamWriter sw = new StreamWriter(filename))
+            {
+                var settings = new JsonSerializerSettings
+                {
+                    Converters = new JsonConverter[] {
+                        new TypePrefixEnumConverter()
+                    }
+                };
+                List<JsonSingleStationWorkPlan> jWorkPlan = new List<JsonSingleStationWorkPlan>();
+                foreach (KeyValuePair<Tuple<Train, SingleTrainSchedule>, Edge> pair in workPlan.trainPlatforms)
+                {
+                    Train train = pair.Key.Item1;
+                    SingleTrainSchedule singleTrainSchedule = pair.Key.Item2;
+                    Edge edge = pair.Value;
+                    JsonSingleSchedule jSingleSchedule = new JsonSingleSchedule(
+                        train,
+                        singleTrainSchedule.GetTimeArrival(),
+                        singleTrainSchedule.GetTimeDeparture(),
+                        singleTrainSchedule.GetTimeStop(),
+                        singleTrainSchedule.GetVertexIn().getId(),
+                        singleTrainSchedule.GetVertexOut().getId());
+                    JsonEdge jEdge = new JsonEdge(
+                        edge.getId(), 
+                        edge.GetLength(),
+                        edge.GetStart().getId(),
+                        edge.GetEnd().getId(),
+                        edge.GetEdgeType());
+                    JsonSingleStationWorkPlan jsp = new JsonSingleStationWorkPlan(
+                        jSingleSchedule,
+                        jEdge);
+                    jWorkPlan.Add(jsp);
+                }
+
+                string json = JsonConvert.SerializeObject(jWorkPlan, Formatting.Indented, settings);
+                //string json = JsonConvert.SerializeObject(workPlan, Formatting.Indented, settings);
+                if (json != null)
+                {
+                    sw.Write(json);
+                    sw.Close();
+                    return;
+                }
+                else
+                {
+                    sw.Close();
+                    throw new Exception("Couldn't serialize station work plan.");
+                }
+            }
+        }
     }
     public class TypePrefixEnumConverter : StringEnumConverter
     {
@@ -268,7 +482,7 @@ namespace SolverLibrary.JsonDoc
             bool isNullable = (Nullable.GetUnderlyingType(objectType) != null);
             Type enumType = (Nullable.GetUnderlyingType(objectType) ?? objectType);
             if (!enumType.IsEnum)
-                throw new JsonSerializationException(string.Format("type {0} is not a enum type", enumType.FullName));
+                throw new JsonSerializationException(string.Format("type {0} is not an enum type", enumType.FullName));
             var prefix = enumType.Name + "_";
 
             if (reader.TokenType == JsonToken.Null)
@@ -295,6 +509,15 @@ namespace SolverLibrary.JsonDoc
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
+            if (value != null && value is Vertex)
+            {
+                JObject jVertex = new JObject
+                {
+                    { "id", ((Vertex)value).getId() }
+                };
+                jVertex.WriteTo(writer);
+                return;
+            }
             var array = new JArray();
             using (var tempWriter = array.CreateWriter())
                 base.WriteJson(tempWriter, value, serializer);
