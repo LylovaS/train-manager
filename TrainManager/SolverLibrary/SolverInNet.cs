@@ -18,5 +18,16 @@ namespace SolverLibrary
             this.timeInaccuracy = timeInaccuracy;
             this.stationNet = stationNet;
         }
+
+        public StationNetWorkPlan CalculateWorkPlan(TrainSheduleInNet sheduleInNet)
+        {
+            StationNetWorkPlan workPlan = new StationNetWorkPlan();
+
+            // Много умного кода ....
+            // ...
+            // ...
+
+            return workPlan;
+        }
     }
 }
