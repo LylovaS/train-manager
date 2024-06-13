@@ -157,7 +157,7 @@ namespace SolverLibrary
                 model.AddExactlyOne(goodConditons);
             }
 
-            PathTimeBlocking timeBlocker = new(timeInaccuracy);
+            PathTimeBlocker timeBlocker = new(timeInaccuracy);
 
             foreach (var train1 in dictSchedule.Keys)
             {

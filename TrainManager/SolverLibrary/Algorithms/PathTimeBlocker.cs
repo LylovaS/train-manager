@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace SolverLibrary.Algorithms
 {
-    internal class PathTimeBlocking
+    internal class PathTimeBlocker
     {
         private int timeInaccuracy;
 
-        public PathTimeBlocking(int timeInaccuracy)
+        public PathTimeBlocker(int timeInaccuracy)
         {
             this.timeInaccuracy = timeInaccuracy;
         }
