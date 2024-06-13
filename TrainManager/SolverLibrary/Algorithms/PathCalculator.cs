@@ -6,11 +6,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 namespace SolverLibrary.Algorithms
 {
-    internal class PathCalculations
+    internal class PathCalculator
     {
+        private StationGraph station;
+        internal readonly Dictionary<InputVertex, List<GraphPath>> pathsStartFromInputVertex = new();
+        internal readonly HashSet<Tuple<Vertex?, Vertex>> platformsWithDirection = new();
+        internal readonly Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatform = new();
+        internal readonly HashSet<Vertex> outputVertexes = new();
+
+        public PathCalculator(StationGraph station) 
+        { 
+            this.station = station;
+            calculatePathsFromIn(
+                station.GetInputVertices(),
+                this.platformsWithDirection,
+                this.pathsStartFromInputVertex
+                );
+            calculatePathsFromPlatfroms(
+                this.platformsWithDirection,
+                this.outputVertexes,
+                this.pathsStartFromPlatform
+                );
+        }
+
         internal static void calculatePathsFromIn(
             HashSet<InputVertex> inputVertices,
             HashSet<Tuple<Vertex?, Vertex>> platformsWithDirection,

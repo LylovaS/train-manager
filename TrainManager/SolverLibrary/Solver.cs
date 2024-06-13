@@ -41,12 +41,12 @@ namespace SolverLibrary
             Dictionary<InputVertex, List<GraphPath>> pathsStartFromVertex = new();
 
             // Calculate pathes that start from InputVertex and end on some platform
-            PathCalculations.calculatePathsFromIn(inputVertices, platformsWithDirection, pathsStartFromVertex);
+            PathCalculator.calculatePathsFromIn(inputVertices, platformsWithDirection, pathsStartFromVertex);
 
             Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatfrom = new();
             HashSet<Vertex> outputVertexes = new();
             // Calculate pathes that start from platform and end in OutputVertex
-            PathCalculations.calculatePathsFromPlatfroms(platformsWithDirection, outputVertexes, pathsStartFromPlatfrom);
+            PathCalculator.calculatePathsFromPlatfroms(platformsWithDirection, outputVertexes, pathsStartFromPlatfrom);
 
             CpModel model = new CpModel();
 
