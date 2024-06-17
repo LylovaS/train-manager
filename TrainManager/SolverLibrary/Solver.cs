@@ -14,18 +14,24 @@ using System.IO;
 using System.Diagnostics;
 using SolverLibrary.Model.PlanUnit;
 using SolverLibrary.Algorithms;
+using Constraint = Google.OrTools.Sat.Constraint;
+using System.ComponentModel;
 
 namespace SolverLibrary
 {
     public class Solver
     {
         private StationGraph station;
+        private PathCalculator pathCalculator;
         private int timeInaccuracy;
         public Solver(StationGraph station, int timeInaccuracy) 
         {
             station.CheckStationGraph();
             this.timeInaccuracy = timeInaccuracy;
             this.station = station;
+            // Calculate pathes that start from InputVertex and end on some platform
+            // Calculate pathes that start from platform and end in OutputVertex
+            this.pathCalculator = new PathCalculator(station);
         }
 
         public StationWorkPlan CalculateWorkPlan(TrainSchedule schedule)
@@ -37,16 +43,11 @@ namespace SolverLibrary
             }
             Dictionary<Train, SingleTrainSchedule> dictSchedule = schedule.GetSchedule();
             HashSet<InputVertex> inputVertices = station.GetInputVertices();
-            HashSet<Tuple<Vertex?, Vertex>> platformsWithDirection = new();
-            Dictionary<InputVertex, List<GraphPath>> pathsStartFromVertex = new();
 
-            // Calculate pathes that start from InputVertex and end on some platform
-            PathCalculator.calculatePathsFromIn(inputVertices, platformsWithDirection, pathsStartFromVertex);
-
-            Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatfrom = new();
-            HashSet<Vertex> outputVertexes = new();
-            // Calculate pathes that start from platform and end in OutputVertex
-            PathCalculator.calculatePathsFromPlatfroms(platformsWithDirection, outputVertexes, pathsStartFromPlatfrom);
+            HashSet<Tuple<Vertex?, Vertex>> platformsWithDirection = pathCalculator.platformsWithDirection;
+            Dictionary<InputVertex, List<GraphPath>> pathsStartFromVertex = pathCalculator.pathsStartFromInputVertex;
+            Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatform = pathCalculator.pathsStartFromPlatform;
+            HashSet<Vertex> outputVertexes = pathCalculator.outputVertexes;
 
             CpModel model = new CpModel();
 
@@ -69,57 +70,9 @@ namespace SolverLibrary
                 platformId[platform] = platformsCnt;
                 platformsCnt++;
             }
-            
-            // Create BoolVar for each train condition
-            BoolVar[,] trainGoesThroughPlatf = new BoolVar[trainsCnt, platformsCnt];
-            for (int i = 0; i < trainsCnt; ++i)
-            {
-                for (int j = 0; j < platformsCnt; ++j)
-                {
-                    trainGoesThroughPlatf[i, j] = model.NewBoolVar($"x[{i}, {j}]");
-                }
-            }
 
             //Find paths for each train condition
-            Tuple<GraphPath?, GraphPath?>[,] trainConditionPaths = new Tuple<GraphPath?, GraphPath?>[trainsCnt, platformsCnt];
-            for (int i = 0; i < trainsCnt; ++i)
-            {
-                for (int j = 0; j < platformsCnt; ++j)
-                {
-                    trainConditionPaths[i, j] = new(null, null);
-                }
-            }
-            foreach (var train in dictSchedule.Keys)
-            {
-                var trainSchedule = dictSchedule[train];
-                InputVertex input = trainSchedule.GetVertexIn();
-                Vertex output = trainSchedule.GetVertexOut();
-                foreach (var pathFromIn in pathsStartFromVertex[input])
-                {
-                    var vertices = pathFromIn.GetVertices();
-                    Tuple<Vertex, Vertex> platform = new(vertices[vertices.Count - 2], vertices[vertices.Count - 1]);
-                    foreach (var pathFromPlat in pathsStartFromPlatfrom[platform])
-                    {
-                        if (pathFromPlat.GetVertices().Last() == output)
-                        {
-                            Edge edgePlat = HelpFunctions.findEdge(platform.Item1, platform.Item2);
-                            if (edgePlat == null)
-                            {
-                                continue;
-                            }
-
-                            int travelTime = (pathFromIn.length + pathFromPlat.length + train.GetSpeed() - 1) / train.GetSpeed(); 
-                            if ( edgePlat.GetLength() >= train.GetLength() &&
-                                (train.GetTrainType() == TrainType.NONE || edgePlat.GetEdgeType() == train.GetTrainType()) &&
-                                 trainSchedule.GetTimeArrival() + trainSchedule.GetTimeStop() + travelTime <= trainSchedule.GetTimeDeparture()
-                                )
-                            {
-                                trainConditionPaths[trainId[train], platformId[platform]] = new(pathFromIn, pathFromPlat);
-                            }
-                        }
-                    }
-                }
-            }
+            Tuple<GraphPath?, GraphPath?>[,] trainConditionPaths = pathCalculator.calculateTrainConditionPaths(trainId, platformId, schedule);
 
             // Check that for each train we have at least one suitable and reachable platform 
             foreach (var train in dictSchedule.Keys)
@@ -135,7 +88,17 @@ namespace SolverLibrary
                 }
                 if (!hasSuitablePlat)
                 {
-                    throw new Exception("One of train hasn't suitable and reachable platform");
+                    throw new Exception("One of trains doesn't have a suitable and reachable platform");
+                }
+            }
+
+            // Create BoolVar for each train condition
+            BoolVar[,] trainGoesThroughPlatf = new BoolVar[trainsCnt, platformsCnt];
+            for (int i = 0; i < trainsCnt; ++i)
+            {
+                for (int j = 0; j < platformsCnt; ++j)
+                {
+                    trainGoesThroughPlatf[i, j] = model.NewBoolVar($"x[{i}, {j}]");
                 }
             }
 
@@ -195,7 +158,383 @@ namespace SolverLibrary
                             foreach (var edge in edgesTimeBlocks1.Keys)
                             {
                                 if (edgesTimeBlocks2.ContainsKey(edge)) {
-                                    if (HelpFunctions.hasListsOfIntervalsIntrsection(edgesTimeBlocks1[edge], edgesTimeBlocks2[edge]))
+                                    if (HelpFunctions.hasListsOfIntervalsIntersection(edgesTimeBlocks1[edge], edgesTimeBlocks2[edge]))
+                                    {
+                                        flag = false;
+                                    }
+                                }
+                            }
+                            if (!flag)
+                            {
+                                ILiteral[] boolVars = { trainGoesThroughPlatf[trainId[train1], plat1].Not(), trainGoesThroughPlatf[trainId[train2], plat2].Not() };
+                                model.AddBoolOr(boolVars);
+                            }
+                        }
+                    }
+                }
+            }
+
+            CpSolver solver = new CpSolver();
+            CpSolverStatus status = solver.Solve(model);
+
+            if (status != CpSolverStatus.Optimal && status != CpSolverStatus.Feasible)
+            {
+                throw new Exception("No solution ((((");
+            }
+
+            return ConstructPlan(solver, dictSchedule, trainConditionPaths, trainGoesThroughPlatf, trainId, platformsCnt);
+        }
+
+        public StationWorkPlan ReconfigureStationWorkPlan(StationWorkPlan plan, TrainSchedule trainSchedule)
+        {
+            // Check the graph for stupid errors
+            if (!this.station.CheckStationGraph())
+            {
+                throw new Exception("Something wrong with graph");
+            }
+            Dictionary<Train, SingleTrainSchedule> dictSchedule = trainSchedule.GetSchedule();
+            HashSet<InputVertex> inputVertices = station.GetInputVertices();
+
+            HashSet<Tuple<Vertex?, Vertex>> platformsWithDirection = pathCalculator.platformsWithDirection;
+            Dictionary<InputVertex, List<GraphPath>> pathsStartFromVertex = pathCalculator.pathsStartFromInputVertex;
+            Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatform = pathCalculator.pathsStartFromPlatform;
+            HashSet<Vertex> outputVertexes = pathCalculator.outputVertexes;
+
+            CpModel model = new CpModel();
+
+            // Enumerate trains and platforms
+            Dictionary<Train, int> trainId = new();
+            int trainsCnt = 0;
+            foreach (var schedule in dictSchedule)
+            {
+                if (trainId.ContainsKey(schedule.Key))
+                {
+                    throw new Exception("Duplicate train in schedule");
+                }
+                trainId[schedule.Key] = trainsCnt;
+                trainsCnt++;
+            }
+            Dictionary<Tuple<Vertex, Vertex>, int> platformId = new();
+            int platformsCnt = 0;
+            foreach (var platform in platformsWithDirection)
+            {
+                platformId[platform] = platformsCnt;
+                platformsCnt++;
+            }
+
+            //Find paths for each train condition
+            Tuple<GraphPath?, GraphPath?>[,] trainConditionPaths = pathCalculator.calculateTrainConditionPaths(trainId, platformId, trainSchedule);
+
+            // Check that for each train we have at least one suitable and reachable platform 
+            foreach (var train in dictSchedule.Keys)
+            {
+                bool hasSuitablePlat = false;
+                for (int j = 0; j < platformsCnt; ++j)
+                {
+                    if (trainConditionPaths[trainId[train], j].Item1 != null &&
+                        trainConditionPaths[trainId[train], j].Item2 != null)
+                    {
+                        hasSuitablePlat = true;
+                    }
+                }
+                if (!hasSuitablePlat)
+                {
+                    throw new Exception("One of train hasn't suitable and reachable platform");
+                }
+            }
+
+            // Create BoolVar for each train condition
+            BoolVar[,] trainGoesThroughPlatf = new BoolVar[trainsCnt, platformsCnt];
+            for (int i = 0; i < trainsCnt; ++i)
+            {
+                for (int j = 0; j < platformsCnt; ++j)
+                {
+                    trainGoesThroughPlatf[i, j] = model.NewBoolVar($"x[{i}, {j}]");
+                }
+            }
+
+            // Add constraint for each train with his possible paths
+            foreach (var train in dictSchedule.Keys)
+            {
+                List<ILiteral> goodConditons = new();
+                for (int j = 0; j < platformsCnt; ++j)
+                {
+                    if (trainConditionPaths[trainId[train], j].Item1 != null &&
+                        trainConditionPaths[trainId[train], j].Item2 != null)
+                    {
+                        goodConditons.Add(trainGoesThroughPlatf[trainId[train], j]);
+                    }
+                    else
+                    {
+                        model.AddAssumption(trainGoesThroughPlatf[trainId[train], j].Not());
+                    }
+                }
+                model.AddExactlyOne(goodConditons);
+            }
+
+            // Create BoolVar for each train condition
+            Constraint[,] constraints = new Constraint[trainsCnt, platformsCnt];
+            BoolVar[,] trainGoesThroughPlatfOld = new BoolVar[trainsCnt, platformsCnt];
+            for (int i = 0; i < trainsCnt; ++i)
+            {
+                for (int j = 0; j < platformsCnt; ++j)
+                {
+                    trainGoesThroughPlatfOld[i, j] = model.NewBoolVar($"y[{i}, {j}]");
+                }
+            }
+
+            // add to conditions
+            foreach (var platformSchedule in plan.trainPlatforms)
+            {
+                Train train = platformSchedule.Key.Item1;
+                Edge platform = platformSchedule.Value;
+                int id;
+                if (platformId.TryGetValue(new(platform.GetStart(), platform.GetEnd()), out id)
+                    && trainConditionPaths[trainId[train], id].Item1 != null
+                    && trainConditionPaths[trainId[train], id].Item2 != null)
+                {
+                    id = platformId[new(platform.GetStart(), platform.GetEnd())];
+                }
+                else if (platformId.TryGetValue(new(platform.GetEnd(), platform.GetStart()), out id)
+                    && trainConditionPaths[trainId[train], id].Item1 != null
+                    && trainConditionPaths[trainId[train], id].Item2 != null)
+                {
+                    id = platformId[new(platform.GetEnd(), platform.GetStart())];
+                }
+                int bound;
+                for (int j = 0; j < platformsCnt; ++j)
+                {
+                    if (j == id)
+                    {
+                        bound = 1;
+                    }
+                    else
+                    {
+                        bound = 0;
+                    }
+                    constraints[trainId[train], j] = model.Add(trainGoesThroughPlatfOld[trainId[train], j] == bound);
+                }
+            }
+
+            for (int i = 0; i < trainsCnt; i++)
+            {
+                for (int j = 0; j < platformsCnt; ++j)
+                {
+                    ILiteral[] literals = new ILiteral[] { trainGoesThroughPlatfOld[i, j] };
+                    LinearExpr expr = LinearExpr.Sum(literals); 
+                    model.AddMaxEquality(trainGoesThroughPlatf[i, j], new LinearExpr[] { expr });
+                }
+            }
+
+            PathTimeBlocker timeBlocker = new(timeInaccuracy);
+
+            foreach (var train1 in dictSchedule.Keys)
+            {
+                for (int plat1 = 0; plat1 < platformsCnt; ++plat1)
+                {
+                    if (trainConditionPaths[trainId[train1], plat1].Item1 == null ||
+                        trainConditionPaths[trainId[train1], plat1].Item2 == null)
+                    {
+                        continue;
+                    }
+                    var edgesTimeBlocks1 = timeBlocker.calculateEdgesTimeBlocking(
+                                train1, dictSchedule[train1],
+                                trainConditionPaths[trainId[train1], plat1].Item1,
+                                trainConditionPaths[trainId[train1], plat1].Item2);
+                    foreach (var train2 in dictSchedule.Keys)
+                    {
+                        if (train2 == train1)
+                        {
+                            continue;
+                        }
+                        for (int plat2 = 0; plat2 < platformsCnt; ++plat2)
+                        {
+                            if (trainConditionPaths[trainId[train2], plat2].Item1 == null ||
+                                trainConditionPaths[trainId[train2], plat2].Item2 == null)
+                            {
+                                continue;
+                            }
+
+                            bool flag = true;
+                            var edgesTimeBlocks2 = timeBlocker.calculateEdgesTimeBlocking(
+                                train2, dictSchedule[train2],
+                                trainConditionPaths[trainId[train2], plat2].Item1,
+                                trainConditionPaths[trainId[train2], plat2].Item2);
+
+                            foreach (var edge in edgesTimeBlocks1.Keys)
+                            {
+                                if (edgesTimeBlocks2.ContainsKey(edge))
+                                {
+                                    if (HelpFunctions.hasListsOfIntervalsIntersection(edgesTimeBlocks1[edge], edgesTimeBlocks2[edge]))
+                                    {
+                                        flag = false;
+                                    }
+                                }
+                            }
+                            if (!flag)
+                            {
+                                ILiteral[] boolVars = { trainGoesThroughPlatf[trainId[train1], plat1].Not(), trainGoesThroughPlatf[trainId[train2], plat2].Not() };
+                                model.AddBoolOr(boolVars);
+                            }
+                        }
+                    }
+                }
+            }
+
+            CpSolver solver = new CpSolver();
+            CpSolverStatus status = solver.Solve(model);
+
+            if (status != CpSolverStatus.Optimal && status != CpSolverStatus.Feasible)
+            {
+                throw new Exception("No solution ((((");
+            }
+
+            return ConstructPlan(solver, dictSchedule, trainConditionPaths, trainGoesThroughPlatf, trainId, platformsCnt);
+        }
+
+        public bool matchWorkplanToStation(StationWorkPlan plan, TrainSchedule trainSchedule)
+        {
+            Dictionary<Train, SingleTrainSchedule> dictSchedule = trainSchedule.GetSchedule();
+            HashSet<InputVertex> inputVertices = station.GetInputVertices();
+
+            HashSet<Tuple<Vertex?, Vertex>> platformsWithDirection = pathCalculator.platformsWithDirection;
+            Dictionary<InputVertex, List<GraphPath>> pathsStartFromVertex = pathCalculator.pathsStartFromInputVertex;
+            Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatfrom = pathCalculator.pathsStartFromPlatform;
+            HashSet<Vertex> outputVertexes = pathCalculator.outputVertexes;
+
+            CpModel model = new CpModel();
+
+            // Enumerate trains and platforms
+            Dictionary<Train, int> trainId = new();
+            int trainsCnt = 0;
+            foreach (var s in dictSchedule)
+            {
+                if (trainId.ContainsKey(s.Key))
+                {
+                    throw new Exception("Duplicate train in schedule");
+                }
+                trainId[s.Key] = trainsCnt;
+                trainsCnt++;
+            }
+            Dictionary<Tuple<Vertex, Vertex>, int> platformId = new();
+            int platformsCnt = 0;
+            foreach (var platform in platformsWithDirection)
+            {
+                platformId[platform] = platformsCnt;
+                platformsCnt++;
+            }
+
+            //Find paths for each train condition
+            Tuple<GraphPath?, GraphPath?>[,] trainConditionPaths = pathCalculator.calculateTrainConditionPaths(trainId, platformId, trainSchedule);
+
+            // Check that plan has assigned a suitable and reachable platform for each train 
+            // and there is a path to and from the assigned platform
+            foreach (var schedule in dictSchedule)
+            {
+                Train train = schedule.Key;
+                SingleTrainSchedule singleSchedule = schedule.Value;
+                Edge? platform;
+                if (!plan.trainPlatforms.TryGetValue(new(train, singleSchedule), out platform) || platform == null
+                    || !platform.GetEdgeType().Equals(train.GetTrainType()))
+                {
+                    throw new Exception($"Cannot assign given platform to train {trainId[train]}");
+                    //return false;
+                }
+                Tuple<GraphPath?, GraphPath?> path = trainConditionPaths[trainId[train], platformId[new(platform.GetStart(), platform.GetEnd())]];
+                if (path.Item1 == null || path.Item2 == null)
+                {
+                    path = trainConditionPaths[trainId[train], platformId[new(platform.GetEnd(), platform.GetStart())]];
+                    if (path.Item1 == null || path.Item2 == null)
+                    {
+                        throw new Exception($"No path to and from platform {platform.getId()}");
+                        //return false;
+                    }
+                }
+            }
+
+            // Create BoolVar for each train condition
+            BoolVar[,] trainGoesThroughPlatf = new BoolVar[trainsCnt, platformsCnt];
+            for (int i = 0; i < trainsCnt; ++i)
+            {
+                for (int j = 0; j < platformsCnt; ++j)
+                {
+                    trainGoesThroughPlatf[i, j] = model.NewBoolVar($"x[{i}, {j}]");
+                }
+            }
+
+            // add conditions according to plan
+            foreach (var platformSchedule in plan.trainPlatforms)
+            {
+                Train train = platformSchedule.Key.Item1;
+                Edge platform = platformSchedule.Value;
+                int id;
+                if (platformId.TryGetValue(new(platform.GetStart(), platform.GetEnd()), out id)
+                    && trainConditionPaths[trainId[train], id].Item1 != null 
+                    && trainConditionPaths[trainId[train], id].Item2 != null)
+                {
+                    id = platformId[new(platform.GetStart(), platform.GetEnd())];
+                }
+                else if (platformId.TryGetValue(new(platform.GetEnd(), platform.GetStart()), out id)
+                    && trainConditionPaths[trainId[train], id].Item1 != null
+                    && trainConditionPaths[trainId[train], id].Item2 != null)
+                {
+                    id = platformId[new(platform.GetEnd(), platform.GetStart())];
+                }
+                List<ILiteral> goodConditons = new();
+                for (int j = 0; j < platformsCnt; ++j)
+                {
+                    if (j == id)
+                    {
+                        goodConditons.Add(trainGoesThroughPlatf[trainId[train], j]);
+                    }
+                    else
+                    {
+                        model.AddAssumption(trainGoesThroughPlatf[trainId[train], j].Not());
+                    }
+                }
+                model.AddExactlyOne(goodConditons);
+            }
+
+            PathTimeBlocker timeBlocker = new(timeInaccuracy);
+
+            foreach (var train1 in dictSchedule.Keys)
+            {
+                for (int plat1 = 0; plat1 < platformsCnt; ++plat1)
+                {
+                    if (trainConditionPaths[trainId[train1], plat1].Item1 == null ||
+                        trainConditionPaths[trainId[train1], plat1].Item2 == null)
+                    {
+                        continue;
+                    }
+                    var edgesTimeBlocks1 = timeBlocker.calculateEdgesTimeBlocking(
+                                train1, dictSchedule[train1],
+                                trainConditionPaths[trainId[train1], plat1].Item1,
+                                trainConditionPaths[trainId[train1], plat1].Item2);
+                    foreach (var train2 in dictSchedule.Keys)
+                    {
+                        if (train2 == train1)
+                        {
+                            continue;
+                        }
+                        for (int plat2 = 0; plat2 < platformsCnt; ++plat2)
+                        {
+                            if (trainConditionPaths[trainId[train2], plat2].Item1 == null ||
+                                trainConditionPaths[trainId[train2], plat2].Item2 == null)
+                            {
+                                continue;
+                            }
+
+                            bool flag = true;
+                            var edgesTimeBlocks2 = timeBlocker.calculateEdgesTimeBlocking(
+                                train2, dictSchedule[train2],
+                                trainConditionPaths[trainId[train2], plat2].Item1,
+                                trainConditionPaths[trainId[train2], plat2].Item2);
+
+                            foreach (var edge in edgesTimeBlocks1.Keys)
+                            {
+                                if (edgesTimeBlocks2.ContainsKey(edge))
+                                {
+                                    if (HelpFunctions.hasListsOfIntervalsIntersection(edgesTimeBlocks1[edge], edgesTimeBlocks2[edge]))
                                     {
                                         flag = false;
                                     }
@@ -212,14 +551,29 @@ namespace SolverLibrary
             }
 
 
+            // try to match trains with stopping platforms according to current plan
             CpSolver solver = new CpSolver();
             CpSolverStatus status = solver.Solve(model);
 
             if (status != CpSolverStatus.Optimal && status != CpSolverStatus.Feasible)
             {
-                throw new Exception("No solution ((((");
+                throw new Exception("Couldn't make a schedule for current plan.");
+                //return false;
             }
 
+            //return ConstructPlan(solver, dictSchedule, trainConditionPaths, trainGoesThroughPlatf, trainId, platformsCnt);
+            return true;
+        }
+
+        private StationWorkPlan ConstructPlan(
+            CpSolver solver, 
+            Dictionary<Train, SingleTrainSchedule> dictSchedule, 
+            Tuple<GraphPath?, GraphPath?>[,] trainConditionPaths, 
+            BoolVar[,] trainGoesThroughPlatf, 
+            Dictionary<Train, int> trainId, 
+            int platformsCnt
+            )
+        {
             StationWorkPlan plan = new();
             foreach (Train train in dictSchedule.Keys)
             {
@@ -232,7 +586,7 @@ namespace SolverLibrary
                     }
                 }
             }
-            
+
             foreach (Train train in dictSchedule.Keys)
             {
                 var trainSchedule = dictSchedule[train];
@@ -241,7 +595,7 @@ namespace SolverLibrary
                 {
                     if (solver.Value(trainGoesThroughPlatf[trainId[train], j]) == 1)
                     {
-                        platform = j; break;  
+                        platform = j; break;
                     }
                 }
                 var vertices = trainConditionPaths[trainId[train], platform].Item1.GetVertices();
@@ -289,7 +643,8 @@ namespace SolverLibrary
                     {
                         planUnits.Add(new(v, pastTime[v] + 1, unit.GetBeginTime() - 1, TrafficLightStatus.STOP));
                     }
-                } else
+                }
+                else
                 {
                     planUnits.Add(new(v, int.MinValue, unit.GetBeginTime() - 1, TrafficLightStatus.STOP));
                 }

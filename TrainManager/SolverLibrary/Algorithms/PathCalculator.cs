@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
+using SolverLibrary.Model;
 
 namespace SolverLibrary.Algorithms
 {
@@ -228,6 +230,59 @@ namespace SolverLibrary.Algorithms
                 }
                 pathsStartFromPlatfrom[startPos] = paths;
             }
+        }
+
+        internal Tuple<GraphPath?, GraphPath?>[,] calculateTrainConditionPaths(
+            Dictionary<Train, int> trainId, 
+            Dictionary<Tuple<Vertex, Vertex>, int> platformId,
+            TrainSchedule schedule)
+        {
+            Dictionary<Train, SingleTrainSchedule> dictSchedule = schedule.GetSchedule();
+            Dictionary<InputVertex, List<GraphPath>> pathsStartFromVertex = this.pathsStartFromInputVertex;
+            Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatform = this.pathsStartFromPlatform;
+            int trainsCnt = trainId.Count;
+            int platformsCnt = platformId.Count;
+            //Find paths for each train condition
+            Tuple<GraphPath?, GraphPath?>[,] trainConditionPaths = new Tuple<GraphPath?, GraphPath?>[trainsCnt, platformsCnt];
+            for (int i = 0; i < trainsCnt; ++i)
+            {
+                for (int j = 0; j < platformsCnt; ++j)
+                {
+                    trainConditionPaths[i, j] = new(null, null);
+                }
+            }
+            foreach (var train in dictSchedule.Keys)
+            {
+                var trainSchedule = dictSchedule[train];
+                InputVertex input = trainSchedule.GetVertexIn();
+                Vertex output = trainSchedule.GetVertexOut();
+                foreach (var pathFromIn in pathsStartFromVertex[input])
+                {
+                    var vertices = pathFromIn.GetVertices();
+                    Tuple<Vertex, Vertex> platform = new(vertices[vertices.Count - 2], vertices[vertices.Count - 1]);
+                    foreach (var pathFromPlat in pathsStartFromPlatform[platform])
+                    {
+                        if (pathFromPlat.GetVertices().Last() == output)
+                        {
+                            Edge edgePlat = HelpFunctions.findEdge(platform.Item1, platform.Item2);
+                            if (edgePlat == null)
+                            {
+                                continue;
+                            }
+
+                            int travelTime = (pathFromIn.length + pathFromPlat.length + train.GetSpeed() - 1) / train.GetSpeed();
+                            if (edgePlat.GetLength() >= train.GetLength() &&
+                                (train.GetTrainType() == TrainType.NONE || edgePlat.GetEdgeType() == train.GetTrainType()) &&
+                                 trainSchedule.GetTimeArrival() + trainSchedule.GetTimeStop() + travelTime <= trainSchedule.GetTimeDeparture()
+                                )
+                            {
+                                trainConditionPaths[trainId[train], platformId[platform]] = new(pathFromIn, pathFromPlat);
+                            }
+                        }
+                    }
+                }
+            }
+            return trainConditionPaths;
         }
     }
 }
