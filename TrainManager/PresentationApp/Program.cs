@@ -46,13 +46,10 @@ namespace MyApp
 
 
 
-            Edge? edge = graph.GetEdges().Where(e => e.getId() == 10).FirstOrDefault();
-            //if (edge == null) { throw new Exception("Where is the edge?"); }
-            workPlan.trainPlatforms[workPlan.trainPlatforms.ElementAt(2).Key] = edge;
-            if (workPlan.trainPlatforms[workPlan.trainPlatforms.ElementAt(2).Key] == edge)
-            {
-                Console.WriteLine("OK");
-            }
+            Edge? edge1 = graph.GetEdges().Where(e => e.getId() == 10).FirstOrDefault();
+            workPlan.trainPlatforms[workPlan.trainPlatforms.ElementAt(2).Key] = edge1;
+            Edge? edge2 = graph.GetEdges().Where(e => e.getId() == 19).FirstOrDefault();
+            workPlan.trainPlatforms[workPlan.trainPlatforms.ElementAt(1).Key] = edge2;
             //StationWorkPlan workPlan2 = solver.matchWorkplanToStation(workPlan, schedule);
             //if (solver.matchWorkplanToStation(workPlan, schedule)) { Console.WriteLine("Matching is alright!"); }
             //else {  Console.WriteLine("Matching is WRONG!"); }

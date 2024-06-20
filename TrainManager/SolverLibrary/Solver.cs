@@ -2,20 +2,10 @@
 using SolverLibrary.Model.Graph;
 using SolverLibrary.Model.Graph.VertexTypes;
 using SolverLibrary.Model.TrainInfo;
-using Google.OrTools.ConstraintSolver;
 using Google.OrTools.Sat;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Diagnostics;
 using SolverLibrary.Model.PlanUnit;
 using SolverLibrary.Algorithms;
 using Constraint = Google.OrTools.Sat.Constraint;
-using System.ComponentModel;
 
 namespace SolverLibrary
 {
@@ -316,15 +306,27 @@ namespace SolverLibrary
                 }
             }
 
+            IntVar[] diff = new IntVar[trainsCnt * platformsCnt];
+
             for (int i = 0; i < trainsCnt; i++)
             {
-                for (int j = 0; j < platformsCnt; ++j)
+                for (int j = 0; j < platformsCnt; j++)
                 {
-                    ILiteral[] literals = new ILiteral[] { trainGoesThroughPlatfOld[i, j] };
-                    LinearExpr expr = LinearExpr.Sum(literals); 
-                    model.AddMaxEquality(trainGoesThroughPlatf[i, j], new LinearExpr[] { expr });
+                    diff[i * platformsCnt + j] = model.NewIntVar(0, 1, $"diff({i},{j})");
                 }
             }
+
+            for (int i = 0; i < trainsCnt; i++)
+            {
+                for (int j = 0; j < platformsCnt; j++)
+                {
+                    model.Add(diff[i * platformsCnt + j] == trainGoesThroughPlatf[i, j].NotAsExpr()).OnlyEnforceIf(trainGoesThroughPlatfOld[i, j]);
+                    model.Add(diff[i * platformsCnt + j] == trainGoesThroughPlatf[i, j]).OnlyEnforceIf(trainGoesThroughPlatfOld[i, j].Not());
+                }
+            }
+            LinearExpr sum = LinearExpr.Sum(diff);
+            model.Minimize(sum);
+
 
             PathTimeBlocker timeBlocker = new(timeInaccuracy);
 
