@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using SolverLibrary.Model;
+using System.Collections;
 
 namespace SolverLibrary.Algorithms
 {
@@ -43,6 +44,8 @@ namespace SolverLibrary.Algorithms
             // Calculate pathes that start from InputVertex and end on some platform
             foreach (InputVertex start in inputVertices)
             {
+                if (start.IsBlocked()) { continue; }
+
                 Dictionary<Tuple<Vertex?, Vertex?>, int> dist = new();
                 Dictionary<Tuple<Vertex?, Vertex?>, Tuple<Vertex?, Vertex?>> parent = new();
                 HashSet<Tuple<Vertex?, Vertex?>> usedPositions = new();
@@ -55,7 +58,11 @@ namespace SolverLibrary.Algorithms
                     Tuple<Vertex?, Vertex?>? bestPos = null;
                     foreach (var pairPosDist in dist)
                     {
-                        if (!usedPositions.Contains(pairPosDist.Key) && (bestPos == null || dist[bestPos] > pairPosDist.Value))
+                        if (!usedPositions.Contains(pairPosDist.Key)
+                            && (bestPos == null || (dist[bestPos] > pairPosDist.Value))
+                            && (pairPosDist.Key.Item1 == null || (!pairPosDist.Key.Item1.IsBlocked()
+                                && !HelpFunctions.findEdge(pairPosDist.Key.Item1, pairPosDist.Key.Item2).IsBlocked()))   
+                            && (pairPosDist.Key.Item2 == null || (!pairPosDist.Key.Item2.IsBlocked())))
                         {
                             bestPos = pairPosDist.Key;
                         }
@@ -87,7 +94,20 @@ namespace SolverLibrary.Algorithms
                         continue;
                     }
                     Vertex v = bestPos.Item2;
-                    foreach (var connection in v.GetEdgeConnections())
+
+                    List<Tuple<Edge?, Edge?>> connections = v.GetEdgeConnections().ToList();
+                    if (v.GetVertexType() == VertexType.SWITCH && ((SwitchVertex)v).GetWorkCondition() == SwitchWorkCondition.FREEZED)
+                    {
+                        if (((SwitchVertex)v).GetStatus() == SwitchStatus.PASSINGCON1)
+                        {
+                            connections.RemoveAt(0);
+                        }
+                        else
+                        {
+                            connections.RemoveAt(1);
+                        }
+                    }
+                    foreach (var connection in connections)
                     {
                         Edge? nextEdge = null;
                         if (bestPos.Item1 == null)
@@ -146,7 +166,12 @@ namespace SolverLibrary.Algorithms
                     Tuple<Vertex?, Vertex?>? bestPos = null;
                     foreach (var pairPosDist in dist)
                     {
-                        if (!usedPositions.Contains(pairPosDist.Key) && (bestPos == null || dist[bestPos] > pairPosDist.Value))
+                        if (!usedPositions.Contains(pairPosDist.Key) 
+                            && (bestPos == null || dist[bestPos] > pairPosDist.Value)
+                            && (pairPosDist.Key.Item1 == null || !pairPosDist.Key.Item1.IsBlocked())
+                            && (pairPosDist.Key.Item2 == null || (!pairPosDist.Key.Item2.IsBlocked()
+                                && !HelpFunctions.findEdge(pairPosDist.Key.Item1, pairPosDist.Key.Item2).IsBlocked()))
+                                )
                         {
                             bestPos = pairPosDist.Key;
                         }
@@ -183,7 +208,20 @@ namespace SolverLibrary.Algorithms
                         continue;
                     }
                     Vertex v = bestPos.Item2;
-                    foreach (var connection in v.GetEdgeConnections())
+
+                    List<Tuple<Edge?, Edge?>> connections = v.GetEdgeConnections().ToList();
+                    if (v.GetVertexType() == VertexType.SWITCH && ((SwitchVertex)v).GetWorkCondition() == SwitchWorkCondition.FREEZED)
+                    {
+                        if (((SwitchVertex)v).GetStatus() == SwitchStatus.PASSINGCON1)
+                        {
+                            connections.RemoveAt(0);
+                        }
+                        else
+                        {
+                            connections.RemoveAt(1);
+                        }
+                    }
+                    foreach (var connection in connections)
                     {
                         Edge? nextEdge = null;
                         if (bestPos.Item2 == null)
@@ -232,6 +270,7 @@ namespace SolverLibrary.Algorithms
             }
         }
 
+        //Find paths for each train condition
         internal Tuple<GraphPath?, GraphPath?>[,] calculateTrainConditionPaths(
             Dictionary<Train, int> trainId, 
             Dictionary<Tuple<Vertex, Vertex>, int> platformId,
@@ -242,7 +281,7 @@ namespace SolverLibrary.Algorithms
             Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatform = this.pathsStartFromPlatform;
             int trainsCnt = trainId.Count;
             int platformsCnt = platformId.Count;
-            //Find paths for each train condition
+
             Tuple<GraphPath?, GraphPath?>[,] trainConditionPaths = new Tuple<GraphPath?, GraphPath?>[trainsCnt, platformsCnt];
             for (int i = 0; i < trainsCnt; ++i)
             {

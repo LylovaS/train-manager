@@ -24,6 +24,11 @@ namespace SolverLibrary
             this.pathCalculator = new PathCalculator(station);
         }
 
+        public void UpdatePaths()
+        {
+            pathCalculator = new PathCalculator(station);
+        }
+
         public StationWorkPlan CalculateWorkPlan(TrainSchedule schedule)
         {
             // Check the graph for stupid errors

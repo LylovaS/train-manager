@@ -5,6 +5,7 @@ using SolverLibrary;
 using System;
 using System.Security.Cryptography;
 using SolverLibrary.Model.TrainInfo;
+using SolverLibrary.Model.Graph.VertexTypes;
 
 namespace MyApp
 {
@@ -46,8 +47,13 @@ namespace MyApp
 
 
 
-            Edge? edge1 = graph.GetEdges().Where(e => e.getId() == 10).FirstOrDefault();
-            workPlan.trainPlatforms[workPlan.trainPlatforms.ElementAt(2).Key] = edge1;
+            //Edge? edge1 = graph.GetEdges().Where(e => e.getId() == 10).FirstOrDefault();
+            //edge1.GetEnd().Block();
+            SwitchVertex? vertex = (SwitchVertex)graph.GetVertices().Where(v => v.getId() == 8).FirstOrDefault();
+            if (vertex.GetStatus() == SwitchStatus.PASSINGCON1) { vertex.ChangeStatus(); }
+            vertex.ChangeWorkCondition();
+            solver.UpdatePaths();
+            //workPlan.trainPlatforms[workPlan.trainPlatforms.ElementAt(2).Key] = edge1;
             Edge? edge2 = graph.GetEdges().Where(e => e.getId() == 19).FirstOrDefault();
             workPlan.trainPlatforms[workPlan.trainPlatforms.ElementAt(1).Key] = edge2;
             //StationWorkPlan workPlan2 = solver.matchWorkplanToStation(workPlan, schedule);
