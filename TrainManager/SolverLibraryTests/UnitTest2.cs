@@ -19,7 +19,7 @@ namespace SolverLibraryTests
 
             Solver solver = new(graph, 5);
             var workPlan = solver.CalculateWorkPlan(schedule);
-            Assert.AreEqual(schedule.GetSchedule().Count(), workPlan.trainPlatforms.Count);
+            Assert.AreEqual(schedule.GetSchedule().Count(), workPlan.TrainPlatforms.Count);
         }
     }
 }

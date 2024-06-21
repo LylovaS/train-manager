@@ -62,11 +62,11 @@ namespace SolverLibraryTests
 
             Solver solver = new(graph, 5);
             var workPlan = solver.CalculateWorkPlan(schedule);
-            var trainPlatforms = workPlan.trainPlatforms;
+            var trainPlatforms = workPlan.TrainPlatforms;
             JsonParser.SaveJsonStationWorkPlan("./SAVED_station_work_plan.json", workPlan);
 
             StationWorkPlan parsedWorkPlan = JsonParser.LoadJsonStationWorkPlan("./SAVED_station_work_plan.json", graph);
-            var parsedTrainPlatforms = parsedWorkPlan.trainPlatforms;
+            var parsedTrainPlatforms = parsedWorkPlan.TrainPlatforms;
             for (int i = 0; i < parsedTrainPlatforms.Count; i++)
             {
                 Tuple<Train, SingleTrainSchedule> solved = trainPlatforms.Keys.ElementAt(i);

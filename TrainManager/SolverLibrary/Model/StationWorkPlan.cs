@@ -16,7 +16,9 @@ namespace SolverLibrary.Model
         private List<SwitchPlanUnit> SwitchUnits = new List<SwitchPlanUnit>();
         private List<TrafficLightPlanUnit> TrafficUnits = new List<TrafficLightPlanUnit>();
         [JsonProperty]
-        public readonly Dictionary<Tuple<Train, SingleTrainSchedule>, Edge> trainPlatforms = new();
+        private Dictionary<Tuple<Train, SingleTrainSchedule>, Edge> trainPlatforms = new();
+
+        public Dictionary<Tuple<Train, SingleTrainSchedule>, Edge> TrainPlatforms { get => trainPlatforms; set => trainPlatforms = value; }
 
         public StationWorkPlan() { }
 

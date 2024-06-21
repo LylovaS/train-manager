@@ -20,7 +20,7 @@ namespace MyApp
 
             Solver solver = new(graph, 5);
             var workPlan = solver.CalculateWorkPlan(schedule);
-            var trainPlatforms = workPlan.trainPlatforms;
+            var trainPlatforms = workPlan.TrainPlatforms;
             foreach (Tuple<Train, SingleTrainSchedule> i in  trainPlatforms.Keys) 
             {
                 Train train = i.Item1;

@@ -1,6 +1,8 @@
 ﻿
 using SolverLibrary.Model.Graph.VertexTypes;
 using SolverLibrary.Model.Graph;
+using System.Data;
+using SolverLibrary.Model.TrainInfo;
 
 namespace SolverLibrary.Algorithms
 {
@@ -46,6 +48,12 @@ namespace SolverLibrary.Algorithms
                 }
             }
             return false;
+        }
+
+        internal static bool checkPlatfrom(Edge edge, TrainType trainType, int trainLen)
+        {
+            return (trainType == TrainType.NONE || edge.GetEdgeType() == trainType) &&
+                edge.GetLength() >= trainLen;
         }
     }
 }

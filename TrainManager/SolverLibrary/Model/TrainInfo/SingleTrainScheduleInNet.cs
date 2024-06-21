@@ -15,7 +15,17 @@ namespace SolverLibrary.Model.TrainInfo
         private List<StopPointOfPath> movementPath = new();
 
         public Train Train { get => train; set => train = value; }
-        public InputVertex Start { get => start; set => start = value; }
+        public InputVertex Start { get => start; 
+            set
+            {
+                if (movementPath.Count != 0 && !movementPath[0].Station.GetInputVertices().Contains(value))
+                {
+                    throw new Exception("first point of movement path must be in the same station that start point");
+                }
+                start = value;
+            }
+        }
+               
         public int StartTime { get => startTime; set => startTime = value; }
         public List<StopPointOfPath> MovementPath { get => movementPath; set => movementPath = value; }
 
@@ -27,6 +37,10 @@ namespace SolverLibrary.Model.TrainInfo
         }
 
         public void AddPointInMovementPath(StopPointOfPath stopPoint) {
+            if (movementPath.Count == 0 && !stopPoint.Station.GetInputVertices().Contains(start))
+            {
+                throw new Exception("first point of movement path must be in the same station that start point");
+            }
             movementPath.Add(stopPoint);    
         }
     }

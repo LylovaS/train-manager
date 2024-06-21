@@ -44,7 +44,7 @@ namespace SolverLibrary
             PathCalculator.calculatePathsFromIn(inputVertices, platformsWithDirection, pathsStartFromVertex);
 
             Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatfrom = new();
-            HashSet<Vertex> outputVertexes = new();
+            HashSet<OutputVertex> outputVertexes = new();
             // Calculate pathes that start from platform and end in OutputVertex
             PathCalculator.calculatePathsFromPlatfroms(platformsWithDirection, outputVertexes, pathsStartFromPlatfrom);
 
@@ -109,8 +109,7 @@ namespace SolverLibrary
                             }
 
                             int travelTime = (pathFromIn.length + pathFromPlat.length + train.GetSpeed() - 1) / train.GetSpeed(); 
-                            if ( edgePlat.GetLength() >= train.GetLength() &&
-                                (train.GetTrainType() == TrainType.NONE || edgePlat.GetEdgeType() == train.GetTrainType()) &&
+                            if ( HelpFunctions.checkPlatfrom(edgePlat, train.GetTrainType(), train.GetLength()) &&
                                  trainSchedule.GetTimeArrival() + trainSchedule.GetTimeStop() + travelTime <= trainSchedule.GetTimeDeparture()
                                 )
                             {
