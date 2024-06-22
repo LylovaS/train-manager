@@ -27,6 +27,18 @@ namespace SolverLibrary.Model
             trainTypes = new HashSet<TrainType>(stationGraph.GetEdgeTypes());
         }
 
+        public TrainSchedule Clone()
+        {
+            TrainSchedule clone = new TrainSchedule(stationGraph);
+            foreach (var s in schedule)
+            {
+                SingleTrainSchedule scheduleClone = new SingleTrainSchedule(s.Value.GetTimeArrival(), s.Value.GetTimeDeparture(), 
+                    s.Value.GetTimeStop(), s.Value.GetVertexIn(), s.Value.GetVertexOut());
+                clone.TryAddTrainSchedule(s.Key, scheduleClone);
+            }
+            return clone;
+        }
+
         public Dictionary<Train, SingleTrainSchedule> GetSchedule()
         {
             return schedule;

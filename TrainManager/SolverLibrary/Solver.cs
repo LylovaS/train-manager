@@ -411,9 +411,10 @@ namespace SolverLibrary
             {
                 throw new Exception("Something wrong with graph");
             }
-            Dictionary<Train, SingleTrainSchedule> dictSchedule = new (trainSchedule.GetSchedule());
+            Dictionary<Train, SingleTrainSchedule> dictSchedule = new(trainSchedule.GetSchedule());
+            TrainSchedule scheduleCopy = trainSchedule.Clone();
+            Dictionary<Train, SingleTrainSchedule> dictScheduleCopy = new(scheduleCopy.GetSchedule());
             
-            // calculate paths to and from stop platforms for trains which are not at the station 
             HashSet<Vertex> inputVertices = new HashSet<Vertex>(station.GetInputVertices());
             HashSet<Train> trainsPassedPlatforms = new();
             
@@ -426,18 +427,18 @@ namespace SolverLibrary
                 int arrivalTime = arrivedTrainsPos[train].Item2;
                 if (passedStopPlatform[train] && currentEdge != plan.trainPlatforms[new(train, dictSchedule[train])])
                 {
-                    dictSchedule[train].SetTimeStop(0);
+                    dictScheduleCopy[train].SetTimeStop(0);
                     trainsPassedPlatforms.Add(train);
-                    //dictSchedule.Remove(train);
                 }
                 else
                 {
-                    dictSchedule[train].SetVertexIn(start);
+                    dictScheduleCopy[train].SetVertexIn(start);
                     inputVertices.Add(start);
                 }
-                dictSchedule[train].SetTimeArrival(arrivalTime);
+                dictScheduleCopy[train].SetTimeArrival(arrivalTime);
             }
-
+ 
+            // calculate paths for all trains except those which have already passed their stop platforms
             HashSet<Tuple<Vertex?, Vertex>> platformsWithDirection = new();
             Dictionary<Vertex, List<GraphPath>> pathsStartFromVertex = new();
             Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatform = new();
@@ -448,7 +449,7 @@ namespace SolverLibrary
             // Enumerate trains and platforms
             Dictionary<Train, int> trainId = new();
             int trainsCnt = 0;
-            foreach (var schedule in dictSchedule)
+            foreach (var schedule in dictScheduleCopy)
             {
                 if (trainId.ContainsKey(schedule.Key))
                 {
@@ -483,7 +484,7 @@ namespace SolverLibrary
 
             //Find paths for each train condition except for trains which have passed their stop platforms
             Tuple<GraphPath?, GraphPath?>[,] trainConditionPaths = PathCalculator.calculateTrainConditionPaths(
-                dictSchedule, pathsStartFromVertex, pathsStartFromPlatform,
+                dictScheduleCopy, pathsStartFromVertex, pathsStartFromPlatform,
                 trainId, platformId);
 
             // update train condition paths for trains which have passed their stop platforms
@@ -497,7 +498,7 @@ namespace SolverLibrary
                 Vertex end = arrivedTrainsPos[train].Item1.Item2;
                 Edge platform = HelpFunctions.findEdge(start, end);
                 GraphPath pathFromIn = new GraphPath(start, end);
-                SingleTrainSchedule singleSchedule = dictSchedule[train];
+                SingleTrainSchedule singleSchedule = dictScheduleCopy[train];
                 foreach (var pathFromPlat in pathsStartFromPlatform2[new(start, end)])
                 {
                     int travelTime = (pathFromIn.length + pathFromPlat.length + train.GetSpeed() - 1) / train.GetSpeed();
@@ -636,7 +637,8 @@ namespace SolverLibrary
                         continue;
                     }
                     var edgesTimeBlocks1 = timeBlocker.calculateEdgesTimeBlocking(
-                                train1, dictSchedule[train1],
+                                train1, 
+                                dictScheduleCopy[train1],
                                 trainConditionPaths[trainId[train1], plat1].Item1,
                                 trainConditionPaths[trainId[train1], plat1].Item2);
                     foreach (var train2 in dictSchedule.Keys)
@@ -655,7 +657,8 @@ namespace SolverLibrary
 
                             bool flag = true;
                             var edgesTimeBlocks2 = timeBlocker.calculateEdgesTimeBlocking(
-                                train2, dictSchedule[train2],
+                                train2,
+                                dictScheduleCopy[train2],
                                 trainConditionPaths[trainId[train2], plat2].Item1,
                                 trainConditionPaths[trainId[train2], plat2].Item2);
 
