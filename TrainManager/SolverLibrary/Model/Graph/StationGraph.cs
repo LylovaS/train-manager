@@ -77,14 +77,12 @@ namespace SolverLibrary.Model.Graph
             HashSet<Edge> edgesSet = new HashSet<Edge>();
             verticesSet.Clear();
             Vertex start = vertices.First();
-           // verticesSet.Add(start);
             edgesSet.Clear();
             Edge edge = start.GetEdgeConnections().First().Item1;
             if (edge == null)
             {
                 edge = start.GetEdgeConnections().First().Item2;
             }
-            //edgesSet.Add(edge);
             FindAllVertices(start, null, verticesSet, edgesSet);
             return verticesSet.Count == vertices.Count;
         }

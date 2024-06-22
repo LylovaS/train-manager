@@ -49,10 +49,26 @@ namespace MyApp
 
             //Edge? edge1 = graph.GetEdges().Where(e => e.getId() == 10).FirstOrDefault();
             //edge1.GetEnd().Block();
-            SwitchVertex? vertex = (SwitchVertex)graph.GetVertices().Where(v => v.getId() == 8).FirstOrDefault();
-            if (vertex.GetStatus() == SwitchStatus.PASSINGCON1) { vertex.ChangeStatus(); }
-            vertex.ChangeWorkCondition();
-            solver.UpdatePaths();
+
+            /*Edge? edge3 = graph.GetEdges().Where(e => e.getId() == 24).FirstOrDefault();
+            Train arrivedTrain = schedule.GetSchedule().Keys.Where(t => t.GetTrainType() == TrainType.PASSENGER).FirstOrDefault();
+            Dictionary<Train, Tuple<Tuple<Vertex, Vertex>, int>> arrivedTrainPos = new Dictionary<Train, Tuple<Tuple<Vertex, Vertex>, int>>();
+            arrivedTrainPos.Add(
+                arrivedTrain, 
+                new(new(edge3.GetEnd(), edge3.GetStart()), 151));*/
+            Edge? edge3 = graph.GetEdges().Where(e => e.getId() == 12).FirstOrDefault();
+            Train arrivedTrain = schedule.GetSchedule().Keys.Where(t => t.GetTrainType() == TrainType.PASSENGER).FirstOrDefault();
+            Dictionary<Train, Tuple<Tuple<Vertex, Vertex>, int>> arrivedTrainPos = new Dictionary<Train, Tuple<Tuple<Vertex, Vertex>, int>>();
+            arrivedTrainPos.Add(
+                arrivedTrain,
+                new(new(edge3.GetEnd(), edge3.GetStart()), 2310));
+            Dictionary<Train, bool> passedStopPlatform = new Dictionary<Train, bool>();
+            passedStopPlatform.Add(arrivedTrain, true);
+            SwitchVertex? vertex = (SwitchVertex)graph.GetVertices().Where(v => v.getId() == 6).FirstOrDefault();
+            //vertex.Block();
+            //if (vertex.GetStatus() == SwitchStatus.PASSINGCON1) { vertex.ChangeStatus(); }
+            //vertex.ChangeWorkCondition();
+
             //workPlan.trainPlatforms[workPlan.trainPlatforms.ElementAt(2).Key] = edge1;
             Edge? edge2 = graph.GetEdges().Where(e => e.getId() == 19).FirstOrDefault();
             workPlan.trainPlatforms[workPlan.trainPlatforms.ElementAt(1).Key] = edge2;
@@ -60,7 +76,8 @@ namespace MyApp
             //if (solver.matchWorkplanToStation(workPlan, schedule)) { Console.WriteLine("Matching is alright!"); }
             //else {  Console.WriteLine("Matching is WRONG!"); }
 
-            StationWorkPlan workPlan3 = solver.ReconfigureStationWorkPlan(workPlan, schedule);
+            StationWorkPlan workPlan3 = solver.ReconfigureStationWorkPlan(workPlan, schedule, arrivedTrainPos, passedStopPlatform);
+            //StationWorkPlan workPlan3 = solver.ReconfigureStationWorkPlan(workPlan, schedule);
             trainPlatforms = workPlan3.trainPlatforms;
             foreach (Tuple<Train, SingleTrainSchedule> i in trainPlatforms.Keys)
             {

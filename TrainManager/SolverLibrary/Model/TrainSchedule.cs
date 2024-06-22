@@ -59,7 +59,8 @@ namespace SolverLibrary.Model
                 return false;
             }
             // check schedule 
-            InputVertex start = singleSchedule.GetVertexIn();
+            Vertex start = singleSchedule.GetVertexIn();
+            //InputVertex start = singleSchedule.GetVertexIn();
             OutputVertex end = singleSchedule.GetVertexOut();
             if (!stationGraph.GetInputVertices().Contains(start) || !stationGraph.GetOutputVertices().Contains(end))
             {

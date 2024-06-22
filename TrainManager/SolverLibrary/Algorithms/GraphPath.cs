@@ -13,7 +13,7 @@ namespace SolverLibrary.Algorithms
         private List<Vertex> vertices = new();
         public int length = 0;
         public int id = -1;
-        public GraphPath(InputVertex start)
+        public GraphPath(Vertex start)
         {
             vertices.Add(start);
         }
