@@ -43,6 +43,11 @@ namespace SolverLibrary.Algorithms
                         length += connection.Item1.GetLength();
                         break;
                     }
+                    if (connection.Item2 != null && HelpFunctions.hasEdgeThatEndings(connection.Item2, t))
+                    {
+                        length += connection.Item2.GetLength();
+                        break;
+                    }
                 }
                 return true;
             }

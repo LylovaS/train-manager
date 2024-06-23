@@ -108,7 +108,7 @@ namespace SolverLibrary
                                 continue;
                             }
 
-                            int travelTime = (pathFromIn.length + pathFromPlat.length + train.GetSpeed() - 1) / train.GetSpeed(); 
+                            int travelTime = (pathFromIn.length + pathFromPlat.length + train.GetLength() - edgePlat.GetLength() + train.GetSpeed() - 1) / train.GetSpeed(); 
                             if ( HelpFunctions.checkPlatfrom(edgePlat, train.GetTrainType(), train.GetLength()) &&
                                  trainSchedule.GetTimeArrival() + trainSchedule.GetTimeStop() + travelTime <= trainSchedule.GetTimeDeparture()
                                 )

@@ -135,7 +135,7 @@ namespace SolverLibrary
             }
 
             // Добавляем consrtraint в которых описывается структура графа.
-            List<ILiteral> varsForOr = new(2);
+            List<ILiteral> varsForOr = new(2); varsForOr.Add(null); varsForOr.Add(null);
             for (int trainId = 0; trainId < trainsCnt; ++trainId)
             {
                 for (int stationId = 0; stationId < infos[trainId].Count; ++stationId)
@@ -157,8 +157,8 @@ namespace SolverLibrary
                     }
 
                     // Добавляем условия на внутренние пути на станции.
-                    List<InputVertex> inputs = new(1);
-                    List<OutputVertex> outputs = new(1);
+                    List<InputVertex> inputs = new(1); inputs.Add(null);
+                    List<OutputVertex> outputs = new(1); outputs.Add(null);
                     for (int inputId = 0; inputId < infos[trainId][stationId].inputVertexes.Count; ++inputId)
                     {
                         InputVertex inputVertex = infos[trainId][stationId].inputVertexes[inputId];
@@ -431,7 +431,8 @@ namespace SolverLibrary
 
                     foreach (var pathFromPlatform in calculator.pathsStartFromPlatform[platform]) 
                     {
-                        OutputVertex outputVertex = (OutputVertex) pathFromPlatform.GetVertices()[pathFromPlatform.length - 1];
+                        int pathCntVertexes = pathFromPlatform.GetVertices().Count;
+                        OutputVertex outputVertex = (OutputVertex) pathFromPlatform.GetVertices()[pathCntVertexes - 1];
                         if (outputVertices.Contains(outputVertex)) { continue; }
                         if (i != movementPath.Count - 1)
                         {

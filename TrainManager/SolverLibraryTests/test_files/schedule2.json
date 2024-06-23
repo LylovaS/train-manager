@@ -6,7 +6,7 @@
       "trainType": "TrainType_CARGO"
     },
     "timeArrival": 0,
-    "timeDeparture": 3600,
+    "timeDeparture": 13600,
     "timeStop": 2400,
     "vertexIn": 1,
     "vertexOut": 26
@@ -17,8 +17,8 @@
       "speed": 3,
       "trainType": "TrainType_CARGO"
     },
-    "timeArrival": 1000,
-    "timeDeparture": 3800,
+    "timeArrival": 3000,
+    "timeDeparture": 13800,
     "timeStop": 2400,
     "vertexIn": 1,
     "vertexOut": 26
@@ -29,8 +29,8 @@
       "speed": 3,
       "trainType": "TrainType_PASSENGER"
     },
-    "timeArrival": 0,
-    "timeDeparture": 3600,
+    "timeArrival": 13700,
+    "timeDeparture": 23600,
     "timeStop": 2400,
     "vertexIn": 27,
     "vertexOut": 0
