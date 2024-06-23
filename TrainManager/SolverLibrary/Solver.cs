@@ -23,6 +23,7 @@ namespace SolverLibrary
             //this.pathCalculator = new PathCalculator(station);
         }
 
+        // Calculates station workplan for given train schedule (from scratch)
         public StationWorkPlan CalculateWorkPlan(TrainSchedule schedule)
         {
             // Check the graph for stupid errors
@@ -180,7 +181,8 @@ namespace SolverLibrary
             return ConstructPlan(solver, dictSchedule, trainConditionPaths, trainGoesThroughPlatf, trainId, platformsCnt);
         }
 
-        public StationWorkPlan ReconfigureStationWorkPlan(StationWorkPlan plan, TrainSchedule trainSchedule)
+        // Recalculates workplan considering old workplan and new train schedule
+        public StationWorkPlan RecalculateStationWorkPlan(StationWorkPlan plan, TrainSchedule trainSchedule)
         {
             // Check the graph for stupid errors
             if (!this.station.CheckStationGraph())
@@ -285,7 +287,7 @@ namespace SolverLibrary
             // add to conditions
             foreach (var platformSchedule in plan.trainPlatforms)
             {
-                Train train = platformSchedule.Key.Item1;
+                Train train = platformSchedule.Key;
                 Edge platform = platformSchedule.Value;
                 int id;
                 if (platformId.TryGetValue(new(platform.GetStart(), platform.GetEnd()), out id)
@@ -403,7 +405,9 @@ namespace SolverLibrary
             return ConstructPlan(solver, dictSchedule, trainConditionPaths, trainGoesThroughPlatf, trainId, platformsCnt);
         }
 
-        public StationWorkPlan ReconfigureStationWorkPlan(StationWorkPlan plan, TrainSchedule trainSchedule, 
+        // Recalculates workplan in "real-time" simulation considering old workplan and new train schedule
+        // value in arrivedTrainPos dictionary is a pair of directed edge and a timestamp of when the train has reached the edge 
+        public StationWorkPlan RecalculateStationWorkPlan(StationWorkPlan plan, TrainSchedule trainSchedule, 
             Dictionary<Train, Tuple<Tuple<Vertex, Vertex>, int>> arrivedTrainsPos, Dictionary<Train, bool> passedStopPlatform)
         {
             // Check the graph for stupid errors
@@ -425,7 +429,7 @@ namespace SolverLibrary
                 Vertex end = arrivedTrainsPos[train].Item1.Item2;
                 Edge currentEdge = HelpFunctions.findEdge(start, end);                
                 int arrivalTime = arrivedTrainsPos[train].Item2;
-                if (passedStopPlatform[train] && currentEdge != plan.trainPlatforms[new(train, dictSchedule[train])])
+                if (passedStopPlatform[train] && currentEdge != plan.trainPlatforms[train])
                 {
                     dictScheduleCopy[train].SetTimeStop(0);
                     trainsPassedPlatforms.Add(train);
@@ -573,7 +577,7 @@ namespace SolverLibrary
             // add to conditions
             foreach (var platformSchedule in plan.trainPlatforms)
             {
-                Train train = platformSchedule.Key.Item1;
+                Train train = platformSchedule.Key;
                 Edge platform = platformSchedule.Value;
                 int id;
                 if (platformId.TryGetValue(new(platform.GetStart(), platform.GetEnd()), out id)
@@ -739,10 +743,10 @@ namespace SolverLibrary
                 Train train = schedule.Key;
                 SingleTrainSchedule singleSchedule = schedule.Value;
                 Edge? platform;
-                if (!plan.trainPlatforms.TryGetValue(new(train, singleSchedule), out platform) || platform == null
+                if (!plan.trainPlatforms.TryGetValue(train, out platform) || platform == null
                     || !platform.GetEdgeType().Equals(train.GetTrainType()))
                 {
-                    throw new Exception($"Cannot assign given platform to train {trainId[train]}");
+                    throw new Exception($"Cannot assign given platform {platform.getId()} to train {trainId[train]}");
                     //return false;
                 }
                 Tuple<GraphPath?, GraphPath?> path = trainConditionPaths[trainId[train], platformId[new(platform.GetStart(), platform.GetEnd())]];
@@ -751,7 +755,7 @@ namespace SolverLibrary
                     path = trainConditionPaths[trainId[train], platformId[new(platform.GetEnd(), platform.GetStart())]];
                     if (path.Item1 == null || path.Item2 == null)
                     {
-                        throw new Exception($"No path to and from platform {platform.getId()}");
+                        throw new Exception($"No full path to and from platform {platform.getId()}");
                         //return false;
                     }
                 }
@@ -770,7 +774,7 @@ namespace SolverLibrary
             // add conditions according to plan
             foreach (var platformSchedule in plan.trainPlatforms)
             {
-                Train train = platformSchedule.Key.Item1;
+                Train train = platformSchedule.Key;
                 Edge platform = platformSchedule.Value;
                 int id;
                 if (platformId.TryGetValue(new(platform.GetStart(), platform.GetEnd()), out id)
@@ -862,8 +866,8 @@ namespace SolverLibrary
 
             if (status != CpSolverStatus.Optimal && status != CpSolverStatus.Feasible)
             {
-                throw new Exception("Couldn't make a schedule for current plan.");
-                //return false;
+                //throw new Exception("Couldn't make a schedule for current plan.");
+                return false;
             }
 
             //return ConstructPlan(solver, dictSchedule, trainConditionPaths, trainGoesThroughPlatf, trainId, platformsCnt);
@@ -887,7 +891,7 @@ namespace SolverLibrary
                     if (solver.Value(trainGoesThroughPlatf[trainId[train], platform]) == 1)
                     {
                         var tmp = trainConditionPaths[trainId[train], platform].Item1.GetVertices();
-                        plan.AddTrainWithPlatform(train, dictSchedule[train], HelpFunctions.findEdge(tmp[tmp.Count - 1], tmp[tmp.Count - 2]));
+                        plan.AddTrainWithPlatform(train, HelpFunctions.findEdge(tmp[tmp.Count - 1], tmp[tmp.Count - 2]));
                     }
                 }
             }

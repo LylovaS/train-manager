@@ -16,14 +16,14 @@ namespace SolverLibrary.Model
         private List<SwitchPlanUnit> SwitchUnits = new List<SwitchPlanUnit>();
         private List<TrafficLightPlanUnit> TrafficUnits = new List<TrafficLightPlanUnit>();
         [JsonProperty]
-        public readonly Dictionary<Tuple<Train, SingleTrainSchedule>, Edge> trainPlatforms = new();
+        public readonly Dictionary<Train, Edge> trainPlatforms = new();
 
         public StationWorkPlan() { }
 
 
-        internal void AddTrainWithPlatform(Train train, SingleTrainSchedule schedule,Edge platform)
+        internal void AddTrainWithPlatform(Train train, Edge platform)
         {
-            trainPlatforms[new(train, schedule)] = platform;
+            trainPlatforms[train] = platform;
         }
         internal void AddSwitchPlanUnit(SwitchPlanUnit switchPlanUnit)
         {

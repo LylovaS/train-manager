@@ -43,26 +43,6 @@ namespace SolverLibrary.Model.Graph
             return true;
         }
 
-        public bool TryAddVerticeWithEdges(InputVertex vertex)
-        {
-            if (TryAddVerticeWithEdges(vertex as Vertex))
-            {
-                inputVertices.Add(vertex);
-                return true;
-            }
-            return false;
-        }
-
-        public bool TryAddVerticeWithEdges(OutputVertex vertex)
-        {
-            if (TryAddVerticeWithEdges(vertex as Vertex))
-            {
-                outputVertices.Add(vertex);
-                return true;
-            }
-            return false;
-        }
-
         public bool CheckStationGraph()
         {
             foreach (Edge e in edges)
@@ -87,7 +67,7 @@ namespace SolverLibrary.Model.Graph
             return verticesSet.Count == vertices.Count;
         }
 
-        public void FindAllVertices(Vertex vertex, Edge? edge, HashSet<Vertex> acc, HashSet<Edge> path)
+        private void FindAllVertices(Vertex vertex, Edge? edge, HashSet<Vertex> acc, HashSet<Edge> path)
         {
             if (acc.Contains(vertex))
             {
