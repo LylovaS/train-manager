@@ -360,13 +360,13 @@ namespace SolverLibrary
                 }
 
                 var trainPlatforms = solution.TrainPlatforms;
-                Dictionary<Tuple<Train, SingleTrainSchedule>, Edge> origTrainPlatfroms = new();
+                Dictionary<Train, Edge> origTrainPlatforms = new();
                 foreach (var i in trainPlatforms)
                 {
-                    Train origTrain = tmpTrainToOrigSchedule[i.Key.Item1].Train;
-                    origTrainPlatfroms[new(origTrain, i.Key.Item2)] = i.Value;
+                    Train origTrain = tmpTrainToOrigSchedule[i.Key].Train;
+                    origTrainPlatforms[origTrain] = i.Value;
                 }
-                solution.TrainPlatforms = origTrainPlatfroms;
+                solution.TrainPlatforms = origTrainPlatforms;
                 workPlan.Plans[station] = solution;
             }
 

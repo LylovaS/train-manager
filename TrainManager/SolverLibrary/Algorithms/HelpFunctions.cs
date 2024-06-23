@@ -35,7 +35,7 @@ namespace SolverLibrary.Algorithms
             return Math.Min(t1.Item2, t2.Item2) >= Math.Max(t1.Item1, t2.Item1);
         }
 
-        internal static bool hasListsOfIntervalsIntrsection(List<Tuple<int, int>> l1, List<Tuple<int, int>> l2)
+        internal static bool hasListsOfIntervalsIntersection(List<Tuple<int, int>> l1, List<Tuple<int, int>> l2)
         {
             for (int i = 0; i < l1.Count; ++i)
             {

@@ -17,11 +17,12 @@ namespace SolverLibrary.Model.TrainInfo
         [JsonProperty]
         private int timeStop;
         [JsonProperty]
-        private InputVertex vertexIn;
+        private Vertex vertexIn;
+        //private InputVertex vertexIn;
         [JsonProperty]
         private OutputVertex vertexOut;
 
-        public SingleTrainSchedule(int timeArrival, int timeDeparture, int timeStop, InputVertex vertexIn, OutputVertex vertexOut)
+        public SingleTrainSchedule(int timeArrival, int timeDeparture, int timeStop, Vertex vertexIn, OutputVertex vertexOut)
         {
             SetTimeDeparture(timeDeparture);
             SetTimeArrival(timeArrival);
@@ -59,8 +60,8 @@ namespace SolverLibrary.Model.TrainInfo
             CheckTimeStamps();
             this.timeStop = timeStop;
         }
-        public InputVertex GetVertexIn() { return vertexIn; }
-        public void SetVertexIn(InputVertex vertexIn) { this.vertexIn = vertexIn; }
+        public Vertex GetVertexIn() { return vertexIn; }
+        public void SetVertexIn(Vertex vertexIn) { this.vertexIn = vertexIn; }
         public OutputVertex GetVertexOut() { return vertexOut; }
         public void SetVertexOut(OutputVertex vertexOut) { this.vertexOut = vertexOut; }
 
