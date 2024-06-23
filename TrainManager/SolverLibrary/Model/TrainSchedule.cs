@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using SolverLibrary.Model.Graph;
+﻿using SolverLibrary.Model.Graph;
 using SolverLibrary.Model.Graph.VertexTypes;
 using SolverLibrary.Model.TrainInfo;
 
@@ -25,6 +19,18 @@ namespace SolverLibrary.Model
             this.stationGraph = stationGraph;
             schedule = new Dictionary<Train, SingleTrainSchedule>(capacity);
             trainTypes = new HashSet<TrainType>(stationGraph.GetEdgeTypes());
+        }
+
+        public TrainSchedule Clone()
+        {
+            TrainSchedule clone = new TrainSchedule(stationGraph);
+            foreach (var s in schedule)
+            {
+                SingleTrainSchedule scheduleClone = new SingleTrainSchedule(s.Value.GetTimeArrival(), s.Value.GetTimeDeparture(), 
+                    s.Value.GetTimeStop(), s.Value.GetVertexIn(), s.Value.GetVertexOut());
+                clone.TryAddTrainSchedule(s.Key, scheduleClone);
+            }
+            return clone;
         }
 
         public Dictionary<Train, SingleTrainSchedule> GetSchedule()
@@ -59,7 +65,8 @@ namespace SolverLibrary.Model
                 return false;
             }
             // check schedule 
-            InputVertex start = singleSchedule.GetVertexIn();
+            Vertex start = singleSchedule.GetVertexIn();
+            //InputVertex start = singleSchedule.GetVertexIn();
             OutputVertex end = singleSchedule.GetVertexOut();
             if (!stationGraph.GetInputVertices().Contains(start) || !stationGraph.GetOutputVertices().Contains(end))
             {

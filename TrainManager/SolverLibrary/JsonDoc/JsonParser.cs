@@ -371,16 +371,18 @@ namespace SolverLibrary.JsonDoc
         public class JsonSingleStationWorkPlan
         {
             [JsonProperty(Order = 1)]
-            private JsonSingleSchedule schedule;
+            private Train train;
+            //private JsonSingleSchedule schedule;
             [JsonProperty(Order = 2)]
             private JsonEdge edge;
 
-            public JsonSingleStationWorkPlan(JsonSingleSchedule schedule, JsonEdge edge)
+            public JsonSingleStationWorkPlan(Train train, JsonEdge edge)
             {
-                this.schedule = schedule;
+                this.train = train;
+                //this.schedule = schedule;
                 this.edge = edge;
             }
-            public JsonSingleSchedule GetSchedule() { return schedule; }
+            public Train GetTrain() { return train; }
             public JsonEdge GetEdge() { return edge; }
         }
 
@@ -400,16 +402,10 @@ namespace SolverLibrary.JsonDoc
                 List<Vertex> vertices = stationGraph.GetVertices().ToList();
                 foreach (JsonSingleStationWorkPlan p in jWorkPlan)
                 {
-                    JsonSingleSchedule jsonSchedule = p.GetSchedule();
-                    InputVertex? v1 = (InputVertex?)vertices.Find((Vertex v) => { return v.getId().Equals(jsonSchedule.GetVertexIn()); });
-                    OutputVertex? v2 = (OutputVertex?)vertices.Find((Vertex v) => { return v.getId().Equals(jsonSchedule.GetVertexOut()); });
                     Edge? edge = stationGraph.GetEdges().ToList().Find((Edge e) => { return e.getId().Equals(p.GetEdge().GetId()); });
-                    if (v1 != null && v2 != null && edge != null)
+                    if (edge != null)
                     {
-                        SingleTrainSchedule schedule = new SingleTrainSchedule(jsonSchedule.GetTimeArrival(),
-                            jsonSchedule.GetTimeDeparture(), jsonSchedule.GetTimeStop(),
-                            v1, v2);
-                        workPlan.AddTrainWithPlatform(p.GetSchedule().GetTrain(), schedule, edge);
+                        workPlan.AddTrainWithPlatform(p.GetTrain(), edge);
                     }
                 }
                 sr.Close();
@@ -435,18 +431,10 @@ namespace SolverLibrary.JsonDoc
                     }
                 };
                 List<JsonSingleStationWorkPlan> jWorkPlan = new List<JsonSingleStationWorkPlan>();
-                foreach (KeyValuePair<Tuple<Train, SingleTrainSchedule>, Edge> pair in workPlan.trainPlatforms)
+                foreach (KeyValuePair<Train, Edge> pair in workPlan.trainPlatforms)
                 {
-                    Train train = pair.Key.Item1;
-                    SingleTrainSchedule singleTrainSchedule = pair.Key.Item2;
+                    Train train = pair.Key;
                     Edge edge = pair.Value;
-                    JsonSingleSchedule jSingleSchedule = new JsonSingleSchedule(
-                        train,
-                        singleTrainSchedule.GetTimeArrival(),
-                        singleTrainSchedule.GetTimeDeparture(),
-                        singleTrainSchedule.GetTimeStop(),
-                        singleTrainSchedule.GetVertexIn().getId(),
-                        singleTrainSchedule.GetVertexOut().getId());
                     JsonEdge jEdge = new JsonEdge(
                         edge.getId(), 
                         edge.GetLength(),
@@ -454,7 +442,7 @@ namespace SolverLibrary.JsonDoc
                         edge.GetEnd().getId(),
                         edge.GetEdgeType());
                     JsonSingleStationWorkPlan jsp = new JsonSingleStationWorkPlan(
-                        jSingleSchedule,
+                        train,
                         jEdge);
                     jWorkPlan.Add(jsp);
                 }

@@ -16,7 +16,7 @@ namespace SolverLibrary.Algorithms
     internal class PathCalculator
     {
         private StationGraph station;
-        internal readonly Dictionary<InputVertex, List<GraphPath>> pathsStartFromInputVertex = new();
+        internal readonly Dictionary<Vertex, List<GraphPath>> pathsStartFromInputVertex = new();
         internal readonly HashSet<Tuple<Vertex?, Vertex>> platformsWithDirection = new();
         internal readonly Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatform = new();
         internal readonly HashSet<Vertex> outputVertexes = new();
@@ -25,11 +25,11 @@ namespace SolverLibrary.Algorithms
         { 
             this.station = station;
             calculatePathsFromIn(
-                station.GetInputVertices(),
+                new HashSet<Vertex>(station.GetInputVertices()),
                 this.platformsWithDirection,
                 this.pathsStartFromInputVertex
                 );
-            calculatePathsFromPlatfroms(
+            calculatePathsFromPlatforms(
                 this.platformsWithDirection,
                 this.outputVertexes,
                 this.pathsStartFromPlatform
@@ -37,12 +37,12 @@ namespace SolverLibrary.Algorithms
         }
 
         internal static void calculatePathsFromIn(
-            HashSet<InputVertex> inputVertices,
+            HashSet<Vertex> inputVertices,
             HashSet<Tuple<Vertex?, Vertex>> platformsWithDirection,
-            Dictionary<InputVertex, List<GraphPath>> pathsStartFromVertex)
+            Dictionary<Vertex, List<GraphPath>> pathsStartFromVertex)
         {
             // Calculate pathes that start from InputVertex and end on some platform
-            foreach (InputVertex start in inputVertices)
+            foreach (Vertex start in inputVertices)
             {
                 if (start.IsBlocked()) { continue; }
 
@@ -107,30 +107,16 @@ namespace SolverLibrary.Algorithms
                             connections.RemoveAt(1);
                         }
                     }
-                    foreach (var connection in connections)
+                    Edge? nextEdge = null;
+                    HashSet<Edge> edges = new();
+                    foreach (var c in connections)
                     {
-                        Edge? nextEdge = null;
-                        if (bestPos.Item1 == null)
-                        {
-                            // Position in which train just enter station
-                            nextEdge = connection.Item1 != null ? connection.Item1 : connection.Item2;
-                        }
-                        else
-                        {
-                            Tuple<Vertex?, Vertex?> swapedPos = new(bestPos.Item2, bestPos.Item1);
-                            if (connection.Item1 != null && HelpFunctions.hasEdgeThatEndings(connection.Item1, bestPos))
-                            {
-                                nextEdge = connection.Item2;
-                            }
-                            if (connection.Item2 != null && HelpFunctions.hasEdgeThatEndings(connection.Item2, bestPos))
-                            {
-                                nextEdge = connection.Item1;
-                            }
-                        }
-                        if (nextEdge == null)
-                        {
-                            continue;
-                        }
+                        if (c.Item1 != null) { edges.Add(c.Item1); }
+                        if (c.Item2 != null) { edges.Add(c.Item2); }
+                    }
+                    foreach (var connection in edges)
+                    {
+                        nextEdge = connection;
                         Tuple<Vertex?, Vertex?> nextPos = nextEdge.GetStart() == v ? new(v, nextEdge.GetEnd()) : new(v, nextEdge.GetStart());
                         if (!dist.ContainsKey(nextPos) && nextEdge.GetEdgeType() != TrainType.NONE)
                         {
@@ -147,7 +133,7 @@ namespace SolverLibrary.Algorithms
             }
         }
 
-        internal static void calculatePathsFromPlatfroms(
+        internal static void calculatePathsFromPlatforms(
             HashSet<Tuple<Vertex?, Vertex>> platformsWithDirection,
             HashSet<Vertex> outputVertexes,
             Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatfrom
@@ -271,14 +257,13 @@ namespace SolverLibrary.Algorithms
         }
 
         //Find paths for each train condition
-        internal Tuple<GraphPath?, GraphPath?>[,] calculateTrainConditionPaths(
+        internal static Tuple<GraphPath?, GraphPath?>[,] calculateTrainConditionPaths(
+            Dictionary<Train, SingleTrainSchedule> dictSchedule,
+            Dictionary<Vertex, List<GraphPath>> pathsStartFromVertex,
+            Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatform,
             Dictionary<Train, int> trainId, 
-            Dictionary<Tuple<Vertex, Vertex>, int> platformId,
-            TrainSchedule schedule)
+            Dictionary<Tuple<Vertex, Vertex>, int> platformId)
         {
-            Dictionary<Train, SingleTrainSchedule> dictSchedule = schedule.GetSchedule();
-            Dictionary<InputVertex, List<GraphPath>> pathsStartFromVertex = this.pathsStartFromInputVertex;
-            Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatform = this.pathsStartFromPlatform;
             int trainsCnt = trainId.Count;
             int platformsCnt = platformId.Count;
 
@@ -293,7 +278,8 @@ namespace SolverLibrary.Algorithms
             foreach (var train in dictSchedule.Keys)
             {
                 var trainSchedule = dictSchedule[train];
-                InputVertex input = trainSchedule.GetVertexIn();
+                Vertex input = trainSchedule.GetVertexIn();
+                //InputVertex input = trainSchedule.GetVertexIn();
                 Vertex output = trainSchedule.GetVertexOut();
                 foreach (var pathFromIn in pathsStartFromVertex[input])
                 {
