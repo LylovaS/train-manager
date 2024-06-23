@@ -19,7 +19,7 @@ namespace SolverLibrary.Algorithms
         internal readonly Dictionary<Vertex, List<GraphPath>> pathsStartFromInputVertex = new();
         internal readonly HashSet<Tuple<Vertex?, Vertex>> platformsWithDirection = new();
         internal readonly Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatform = new();
-        internal readonly HashSet<Vertex> outputVertexes = new();
+        internal readonly HashSet<OutputVertex> outputVertexes = new();
 
         public PathCalculator(StationGraph station) 
         { 
@@ -34,6 +34,56 @@ namespace SolverLibrary.Algorithms
                 this.outputVertexes,
                 this.pathsStartFromPlatform
                 );
+        }
+
+        internal bool hasPathFromInputVertexToPlatform(InputVertex inputVertex, Tuple<Vertex, Vertex> platform)
+        {
+            foreach(var path in pathsStartFromInputVertex[inputVertex])
+            {
+                var vertices = path.GetVertices();
+                if (vertices.Count >= 2 && vertices[vertices.Count - 1] == platform.Item2 && vertices[vertices.Count - 2] == platform.Item1)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        internal bool hasPathFromPlatformToOutputVertex(Tuple<Vertex, Vertex> platform, OutputVertex outputVertex)
+        {
+            foreach (var path in pathsStartFromPlatform[platform])
+            {
+                var vertices = path.GetVertices();
+                if (vertices.Count >= 1 && vertices[vertices.Count - 1] == outputVertex)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        internal int maxLengthOfPath(
+            List<InputVertex> possibleInputs, List<OutputVertex> possibleOutputs,
+            int trainLength, TrainType platformType) 
+        {
+            int result = 0;
+            foreach (InputVertex inputVertex in possibleInputs)
+            {
+                foreach (GraphPath pathFromInput in pathsStartFromInputVertex[inputVertex])
+                {
+                    var vertices = pathFromInput.GetVertices();
+                    Tuple<Vertex, Vertex> platform = new(vertices[vertices.Count - 2], vertices[vertices.Count - 1]);
+                    Edge platformEdge = HelpFunctions.findEdge(platform.Item1, platform.Item2);
+                    if (!HelpFunctions.checkPlatfrom(platformEdge, platformType, trainLength)) { continue; }
+                    foreach( var pathFromPlatfrom in pathsStartFromPlatform[platform])
+                    {
+                        vertices = pathFromPlatfrom.GetVertices();
+                        if (!possibleOutputs.Contains(vertices[vertices.Count - 1])) { continue; }
+                        result = Math.Max(result, pathFromInput.length + pathFromPlatfrom.length - platformEdge.GetLength());
+                    }
+                }
+            }
+            return result;
         }
 
         internal static void calculatePathsFromIn(
@@ -134,8 +184,8 @@ namespace SolverLibrary.Algorithms
         }
 
         internal static void calculatePathsFromPlatforms(
-            HashSet<Tuple<Vertex?, Vertex>> platformsWithDirection,
-            HashSet<Vertex> outputVertexes,
+            HashSet<Tuple<Vertex, Vertex>> platformsWithDirection,
+            HashSet<OutputVertex> outputVertexes,
             Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatfrom
             )
         {
@@ -237,7 +287,7 @@ namespace SolverLibrary.Algorithms
                         {
                             if (v.GetVertexType() == VertexType.OUTPUT)
                             {
-                                outputVertexes.Add(v);
+                                outputVertexes.Add((OutputVertex) v);
                             }
                             nextPos = new(v, null);
                         }
@@ -295,7 +345,7 @@ namespace SolverLibrary.Algorithms
                                 continue;
                             }
 
-                            int travelTime = (pathFromIn.length + pathFromPlat.length + train.GetSpeed() - 1) / train.GetSpeed();
+                            int travelTime = (pathFromIn.length + pathFromPlat.length + train.GetLength() - edgePlat.GetLength() + train.GetSpeed() - 1) / train.GetSpeed();
                             if (edgePlat.GetLength() >= train.GetLength() &&
                                 (train.GetTrainType() == TrainType.NONE || edgePlat.GetEdgeType() == train.GetTrainType()) &&
                                  trainSchedule.GetTimeArrival() + trainSchedule.GetTimeStop() + travelTime <= trainSchedule.GetTimeDeparture()

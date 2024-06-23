@@ -27,7 +27,7 @@ namespace SolverLibraryTests
 
             Solver solver = new(graph, 5);
             var workPlan = solver.CalculateWorkPlan(schedule);
-            Assert.AreEqual(schedule.GetSchedule().Count(), workPlan.trainPlatforms.Count);
+            Assert.AreEqual(schedule.GetSchedule().Count(), workPlan.TrainPlatforms.Count);
         }
 
         [TestMethod]
@@ -39,14 +39,14 @@ namespace SolverLibraryTests
 
             // swap one platform in workplan with another suitable platform
             Edge? edge1 = graph.GetEdges().Where(e => e.getId() == 10).FirstOrDefault();
-            workPlan.trainPlatforms[workPlan.trainPlatforms.ElementAt(2).Key] = edge1;
-            Assert.AreEqual(workPlan.trainPlatforms[workPlan.trainPlatforms.ElementAt(2).Key], edge1);
+            workPlan.TrainPlatforms[workPlan.TrainPlatforms.ElementAt(2).Key] = edge1;
+            Assert.AreEqual(workPlan.TrainPlatforms[workPlan.TrainPlatforms.ElementAt(2).Key], edge1);
             Assert.IsTrue(solver.matchWorkplanToStation(workPlan, schedule));
 
             // swap one platform in workplan with a platform which is not suitable 
             Edge? edge2 = graph.GetEdges().Where(e => e.getId() == 19).FirstOrDefault();
-            workPlan.trainPlatforms[workPlan.trainPlatforms.ElementAt(1).Key] = edge2;
-            Assert.AreEqual(workPlan.trainPlatforms[workPlan.trainPlatforms.ElementAt(1).Key], edge2);
+            workPlan.TrainPlatforms[workPlan.TrainPlatforms.ElementAt(1).Key] = edge2;
+            Assert.AreEqual(workPlan.TrainPlatforms[workPlan.TrainPlatforms.ElementAt(1).Key], edge2);
             Assert.IsFalse(solver.matchWorkplanToStation(workPlan, schedule));
         }
 
@@ -57,17 +57,17 @@ namespace SolverLibraryTests
             var workPlan = solver.CalculateWorkPlan(schedule);
 
             Edge? edge1 = graph.GetEdges().Where(e => e.getId() == 10).FirstOrDefault();
-            workPlan.trainPlatforms[workPlan.trainPlatforms.ElementAt(2).Key] = edge1;
-            Assert.AreSame(workPlan.trainPlatforms[workPlan.trainPlatforms.ElementAt(2).Key], edge1);
+            workPlan.TrainPlatforms[workPlan.TrainPlatforms.ElementAt(2).Key] = edge1;
+            Assert.AreSame(workPlan.TrainPlatforms[workPlan.TrainPlatforms.ElementAt(2).Key], edge1);
             StationWorkPlan workPlan2 = solver.RecalculateStationWorkPlan(workPlan, schedule);
-            Assert.AreSame(workPlan2.trainPlatforms[workPlan.trainPlatforms.ElementAt(2).Key], edge1);
+            Assert.AreSame(workPlan2.TrainPlatforms[workPlan.TrainPlatforms.ElementAt(2).Key], edge1);
 
             Edge? edge2 = graph.GetEdges().Where(e => e.getId() == 19).FirstOrDefault();
-            workPlan2.trainPlatforms[workPlan2.trainPlatforms.ElementAt(1).Key] = edge2;
-            Assert.AreSame(workPlan2.trainPlatforms[workPlan2.trainPlatforms.ElementAt(1).Key], edge2);
+            workPlan2.TrainPlatforms[workPlan2.TrainPlatforms.ElementAt(1).Key] = edge2;
+            Assert.AreSame(workPlan2.TrainPlatforms[workPlan2.TrainPlatforms.ElementAt(1).Key], edge2);
             StationWorkPlan workPlan3 = solver.RecalculateStationWorkPlan(workPlan2, schedule);
-            Assert.AreSame(workPlan3.trainPlatforms[workPlan.trainPlatforms.ElementAt(2).Key], edge1);
-            Assert.AreNotSame(workPlan3.trainPlatforms[workPlan3.trainPlatforms.ElementAt(1).Key], edge2);
+            Assert.AreSame(workPlan3.TrainPlatforms[workPlan.TrainPlatforms.ElementAt(2).Key], edge1);
+            Assert.AreNotSame(workPlan3.TrainPlatforms[workPlan3.TrainPlatforms.ElementAt(1).Key], edge2);
         }
 
         [TestMethod]
@@ -87,11 +87,11 @@ namespace SolverLibraryTests
             passedStopPlatform.Add(arrivedTrain, true);
 
             Edge? edge2 = graph.GetEdges().Where(e => e.getId() == 19).FirstOrDefault();
-            workPlan.trainPlatforms[workPlan.trainPlatforms.ElementAt(1).Key] = edge2;
+            workPlan.TrainPlatforms[workPlan.TrainPlatforms.ElementAt(1).Key] = edge2;
 
             StationWorkPlan workPlan2 = solver.RecalculateStationWorkPlan(workPlan, schedule, arrivedTrainPos, passedStopPlatform);
-            Assert.AreNotSame(workPlan2.trainPlatforms[workPlan2.trainPlatforms.ElementAt(1).Key], edge2);
-            Assert.AreSame(workPlan2.trainPlatforms[workPlan2.trainPlatforms.ElementAt(2).Key], edge1);
+            Assert.AreNotSame(workPlan2.TrainPlatforms[workPlan2.TrainPlatforms.ElementAt(1).Key], edge2);
+            Assert.AreSame(workPlan2.TrainPlatforms[workPlan2.TrainPlatforms.ElementAt(2).Key], edge1);
 
             // consider that one train is at the station and has NOT passed its stop platform yet
             Edge? edge3 = graph.GetEdges().Where(e => e.getId() == 24).FirstOrDefault();
@@ -108,7 +108,7 @@ namespace SolverLibraryTests
             // edge with id=10 is a platform that train will have to go through
             Edge? edge4 = graph.GetEdges().Where(e => e.getId() == 10).FirstOrDefault();
             StationWorkPlan workPlan3 = solver.RecalculateStationWorkPlan(workPlan, schedule, arrivedTrainPos, passedStopPlatform);
-            Assert.AreSame(workPlan3.trainPlatforms[workPlan3.trainPlatforms.ElementAt(2).Key], edge4);
+            Assert.AreSame(workPlan3.TrainPlatforms[workPlan3.TrainPlatforms.ElementAt(2).Key], edge4);
         }
     }
 }

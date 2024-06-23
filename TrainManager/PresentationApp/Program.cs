@@ -22,7 +22,7 @@ namespace MyApp
             Solver solver = new(graph, 5);
             var workPlan = solver.CalculateWorkPlan(schedule);
             var dictSchedule = schedule.GetSchedule();
-            var trainPlatforms = workPlan.trainPlatforms;
+            var trainPlatforms = workPlan.TrainPlatforms;
             foreach (Train train in trainPlatforms.Keys) 
             {
                 SingleTrainSchedule trainSchedule = dictSchedule[train];
@@ -67,7 +67,7 @@ namespace MyApp
 
             StationWorkPlan workPlan3 = solver.RecalculateStationWorkPlan(workPlan, schedule, arrivedTrainPos, passedStopPlatform);
             //StationWorkPlan workPlan3 = solver.RecalculateStationWorkPlan(workPlan, schedule);
-            trainPlatforms = workPlan3.trainPlatforms;
+            trainPlatforms = workPlan3.TrainPlatforms;
             foreach (Train train in trainPlatforms.Keys)
             {
                 SingleTrainSchedule trainSchedule = dictSchedule[train];

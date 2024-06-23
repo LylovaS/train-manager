@@ -15,5 +15,8 @@ namespace SolverLibrary.Model
         private Dictionary<StationGraph, StationWorkPlan> plans = new();
         // Словарь в котором по станции получаем словарь, в котором по расписанию поезда из расписания в сети получаем расписание этого поезда на станции.
         private Dictionary<StationGraph, Dictionary<SingleTrainScheduleInNet, SingleTrainSchedule>> schedules = new();
+
+        public Dictionary<StationGraph, StationWorkPlan> Plans { get => plans; set => plans = value; }
+        public Dictionary<StationGraph, Dictionary<SingleTrainScheduleInNet, SingleTrainSchedule>> Schedules { get => schedules; set => schedules = value; }
     }
 }

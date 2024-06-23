@@ -15,6 +15,13 @@ namespace SolverLibrary.Model
 
         public void AddSingleTrainSchedule(SingleTrainScheduleInNet trainSchedule)
         {
+            foreach (SingleTrainScheduleInNet singleSchedule in schedule)
+            {
+                if (singleSchedule.Train == trainSchedule.Train)
+                {
+                    throw new Exception("Such train already exist in schedule");
+                }
+            }
             schedule.Add(trainSchedule);
         }
 

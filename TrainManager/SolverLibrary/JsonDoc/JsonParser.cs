@@ -431,7 +431,7 @@ namespace SolverLibrary.JsonDoc
                     }
                 };
                 List<JsonSingleStationWorkPlan> jWorkPlan = new List<JsonSingleStationWorkPlan>();
-                foreach (KeyValuePair<Train, Edge> pair in workPlan.trainPlatforms)
+                foreach (KeyValuePair<Train, Edge> pair in workPlan.TrainPlatforms)
                 {
                     Train train = pair.Key;
                     Edge edge = pair.Value;

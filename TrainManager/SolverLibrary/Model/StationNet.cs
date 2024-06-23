@@ -1,4 +1,5 @@
 ﻿using SolverLibrary.Model.Graph;
+using SolverLibrary.Model.Graph.VertexTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace SolverLibrary.Model
         // все станции в сети
         private List<StationGraph> _stations = new();
         // пути соединяющие входы одной станции с выходом другой станции.
-        private List<Edge> _connections = new();
+        private List<Tuple<InputVertex, OutputVertex, int>> _connections = new();
         public StationNet() {
         }
 
@@ -21,9 +22,20 @@ namespace SolverLibrary.Model
             _stations.Add(station);
         }
 
-        public void AddStationsConnection(Edge edge)
+        public void AddStationsConnection(InputVertex inputVertex, OutputVertex outputVertex, int length)
         {
-            _connections.Add(edge);
+            foreach (var connection in _connections)
+            {
+                if (connection.Item1 == inputVertex )
+                {
+                    throw new Exception("external connections already have a connection with such InputVertex");
+                }
+                if (connection.Item2 == outputVertex)
+                {
+                    throw new Exception("external connections already have a connection with such OutputVertex");
+                }
+            }
+            _connections.Add(new(inputVertex, outputVertex, length));
         }
 
         public List<StationGraph> GetStations()
@@ -31,9 +43,21 @@ namespace SolverLibrary.Model
             return _stations;
         }
 
-        public List<Edge> GetConnections() 
+        public List<Tuple<InputVertex, OutputVertex, int>> GetConnections() 
         {
             return _connections;
+        }
+
+        public bool checkStationNet()
+        {
+            foreach (var station in _stations)
+            {
+                if (!station.CheckStationGraph())
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

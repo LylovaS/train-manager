@@ -37,7 +37,7 @@ namespace SolverLibrary
             HashSet<Tuple<Vertex?, Vertex>> platformsWithDirection = new();
             Dictionary<Vertex, List<GraphPath>> pathsStartFromVertex = new();
             Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatform = new();
-            HashSet<Vertex> outputVertexes = new();
+            HashSet<OutputVertex> outputVertexes = new();
             PathCalculator.calculatePathsFromIn(inputVertices, platformsWithDirection, pathsStartFromVertex);
             PathCalculator.calculatePathsFromPlatforms(platformsWithDirection, outputVertexes, pathsStartFromPlatform);
             // Calculate pathes that start from InputVertex and end on some platform
@@ -195,7 +195,7 @@ namespace SolverLibrary
             HashSet<Tuple<Vertex?, Vertex>> platformsWithDirection = new();
             Dictionary<Vertex, List<GraphPath>> pathsStartFromVertex = new();
             Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatform = new();
-            HashSet<Vertex> outputVertexes = new();
+            HashSet<OutputVertex> outputVertexes = new();
             PathCalculator.calculatePathsFromIn(inputVertices, platformsWithDirection, pathsStartFromVertex);
             PathCalculator.calculatePathsFromPlatforms(platformsWithDirection, outputVertexes, pathsStartFromPlatform);
 
@@ -285,7 +285,7 @@ namespace SolverLibrary
             }
 
             // add to conditions
-            foreach (var platformSchedule in plan.trainPlatforms)
+            foreach (var platformSchedule in plan.TrainPlatforms)
             {
                 Train train = platformSchedule.Key;
                 Edge platform = platformSchedule.Value;
@@ -429,7 +429,7 @@ namespace SolverLibrary
                 Vertex end = arrivedTrainsPos[train].Item1.Item2;
                 Edge currentEdge = HelpFunctions.findEdge(start, end);                
                 int arrivalTime = arrivedTrainsPos[train].Item2;
-                if (passedStopPlatform[train] && currentEdge != plan.trainPlatforms[train])
+                if (passedStopPlatform[train] && currentEdge != plan.TrainPlatforms[train])
                 {
                     dictScheduleCopy[train].SetTimeStop(0);
                     trainsPassedPlatforms.Add(train);
@@ -446,7 +446,7 @@ namespace SolverLibrary
             HashSet<Tuple<Vertex?, Vertex>> platformsWithDirection = new();
             Dictionary<Vertex, List<GraphPath>> pathsStartFromVertex = new();
             Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatform = new();
-            HashSet<Vertex> outputVertexes = new HashSet<Vertex>();
+            HashSet<OutputVertex> outputVertexes = new();
             PathCalculator.calculatePathsFromIn(inputVertices, platformsWithDirection, pathsStartFromVertex);
             PathCalculator.calculatePathsFromPlatforms(platformsWithDirection, outputVertexes, pathsStartFromPlatform);
 
@@ -477,7 +477,7 @@ namespace SolverLibrary
                 platformsWithDirection2.Add(arrivedTrainsPos[train].Item1);
             }
             Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatform2 = new();
-            HashSet<Vertex> outputVertexes2 = new();
+            HashSet<OutputVertex> outputVertexes2 = new();
             PathCalculator.calculatePathsFromPlatforms(platformsWithDirection2, outputVertexes2, pathsStartFromPlatform2);
             foreach (var platform in platformsWithDirection2)
             {
@@ -575,7 +575,7 @@ namespace SolverLibrary
             }
 
             // add to conditions
-            foreach (var platformSchedule in plan.trainPlatforms)
+            foreach (var platformSchedule in plan.TrainPlatforms)
             {
                 Train train = platformSchedule.Key;
                 Edge platform = platformSchedule.Value;
@@ -705,7 +705,7 @@ namespace SolverLibrary
             HashSet<Tuple<Vertex?, Vertex>> platformsWithDirection = new();
             Dictionary<Vertex, List<GraphPath>> pathsStartFromVertex = new();
             Dictionary<Tuple<Vertex, Vertex>, List<GraphPath>> pathsStartFromPlatform = new();
-            HashSet<Vertex> outputVertexes = new();
+            HashSet<OutputVertex> outputVertexes = new();
             PathCalculator.calculatePathsFromIn(inputVertices, platformsWithDirection, pathsStartFromVertex);
             PathCalculator.calculatePathsFromPlatforms(platformsWithDirection, outputVertexes, pathsStartFromPlatform);
 
@@ -743,7 +743,7 @@ namespace SolverLibrary
                 Train train = schedule.Key;
                 SingleTrainSchedule singleSchedule = schedule.Value;
                 Edge? platform;
-                if (!plan.trainPlatforms.TryGetValue(train, out platform) || platform == null
+                if (!plan.TrainPlatforms.TryGetValue(train, out platform) || platform == null
                     || !platform.GetEdgeType().Equals(train.GetTrainType()))
                 {
                     throw new Exception($"Cannot assign given platform {platform.getId()} to train {trainId[train]}");
@@ -772,7 +772,7 @@ namespace SolverLibrary
             }
 
             // add conditions according to plan
-            foreach (var platformSchedule in plan.trainPlatforms)
+            foreach (var platformSchedule in plan.TrainPlatforms)
             {
                 Train train = platformSchedule.Key;
                 Edge platform = platformSchedule.Value;
