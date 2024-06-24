@@ -35,16 +35,35 @@ namespace SolverLibraryTests
             Train train1 = new Train(450, 3, TrainType.CARGO);
             Train train2 = new Train(600, 3, TrainType.PASSENGER);
             SingleTrainScheduleInNet schedule1 = new(train1, FindVertexById(station1.GetInputVertices(), 1), 0);
-            SingleTrainScheduleInNet schedule2 = new(train2, FindVertexById(station2.GetInputVertices(), 27), 0);
+            SingleTrainScheduleInNet schedule2 = new(train2, FindVertexById(station1.GetInputVertices(), 1), 500);
             schedule1.AddPointInMovementPath(new(300, station1, TrainType.CARGO));
             schedule1.AddPointInMovementPath(new(0, station2, TrainType.NONE));
-            schedule2.AddPointInMovementPath(new(300, station2, TrainType.PASSENGER));
-            schedule2.AddPointInMovementPath(new(100, station1, TrainType.PASSENGER));
+            schedule2.AddPointInMovementPath(new(300, station1, TrainType.PASSENGER));
+            schedule2.AddPointInMovementPath(new(100, station2, TrainType.PASSENGER));
             scheduleInNet.AddSingleTrainSchedule(schedule1);
             scheduleInNet.AddSingleTrainSchedule(schedule2);
 
             var solver = new SolverInNet(stationNet, 10);
-            solver.CalculateWorkPlan(scheduleInNet);
+            var result = solver.CalculateWorkPlan(scheduleInNet);
+            Assert.AreEqual(result.Plans[station1].TrainPlatforms[train1].GetEdgeType(), TrainType.CARGO);
+            Assert.AreEqual(result.Plans[station1].TrainPlatforms[train2].GetEdgeType(), TrainType.PASSENGER);
+            Assert.AreEqual(result.Plans[station2].TrainPlatforms[train2].GetEdgeType(), TrainType.PASSENGER);
+            Assert.AreEqual(FindVertexById(station1.GetInputVertices(), 1), result.Schedules[station1][schedule1].GetVertexIn());
+            Assert.AreEqual(FindVertexById(station1.GetOutputVertices(), 26), result.Schedules[station1][schedule1].GetVertexOut());
+            Assert.AreEqual(FindVertexById(station2.GetInputVertices(), 1), result.Schedules[station2][schedule1].GetVertexIn());
+            Assert.AreEqual(FindVertexById(station2.GetOutputVertices(), 26), result.Schedules[station2][schedule1].GetVertexOut());
+
+            Assert.AreEqual(FindVertexById(station1.GetInputVertices(), 1), result.Schedules[station1][schedule2].GetVertexIn());
+            Assert.AreEqual(FindVertexById(station1.GetOutputVertices(), 26), result.Schedules[station1][schedule2].GetVertexOut());
+            Assert.AreEqual(FindVertexById(station2.GetInputVertices(), 1), result.Schedules[station2][schedule2].GetVertexIn());
+            Assert.AreEqual(FindVertexById(station2.GetOutputVertices(), 26), result.Schedules[station2][schedule2].GetVertexOut());
+
+            Console.WriteLine("Result for train1:");
+            Console.WriteLine($"platform id on station1: {result.Plans[station1].TrainPlatforms[train1].getId()}");
+            Console.WriteLine($"platform id on station2: {result.Plans[station2].TrainPlatforms[train1].getId()}");
+            Console.WriteLine("Result for train2:");
+            Console.WriteLine($"platform id on station1: {result.Plans[station1].TrainPlatforms[train2].getId()}");
+            Console.WriteLine($"platform id on station2: {result.Plans[station2].TrainPlatforms[train2].getId()}");
         }
 
         private static OutputVertex FindVertexById(HashSet<OutputVertex> vertices, int id) {
